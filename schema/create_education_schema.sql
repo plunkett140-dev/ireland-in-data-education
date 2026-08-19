@@ -1,7 +1,7 @@
 -- create_education_schema.sql
 -- Ireland in Data — Education & Workforce Data Warehouse
 -- Initialise DuckDB tables for the education pipeline.
--- Run once: python -c "import duckdb; duckdb.connect('data/ireland_in_data.duckdb').execute(open('etl/education/create_education_schema.sql').read())"
+-- Run once: python -c "import duckdb; duckdb.connect('data/education.duckdb').execute(open('schema/create_education_schema.sql').read())"
 --
 -- Decision log:
 --   E001: HEA data may not distinguish UG from GEM within "Health and welfare".
@@ -9,6 +9,17 @@
 --   E002: CSO "Not Captured" ≠ emigration. Always label precisely.
 --   E003: UCD GEM fee €18,800/year — student-verified ground truth (2025/26).
 --         All other institutions marked unverified until confirmed from primary source.
+--         Superseded 2026-08-19: live scrape of UCD's SISWeb fee table found €18,880
+--         for 2025/26 — treated as more reliable than the earlier student report and
+--         written to fact_programme_fees. See notes column on that row.
+--   E004: fact_health_graduates stays NATIONAL-LEVEL (institution_id = NULL for all
+--         CSO-sourced rows). CSO's HGO07 (Number of Health Graduates) has no
+--         institution dimension — only Graduation Year, Nationality, PPSN Validity,
+--         Gender, Field of Study — and no other CSO HGO table adds one. Decided
+--         2026-08-19 not to chase an HEA source for institution-level graduate
+--         counts; national-level still answers the core questions this table exists
+--         for. institution_id has no NOT NULL constraint, so no schema change needed
+--         — this is a documented usage decision, not a migration.
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Dimension: Institutions

@@ -4,13 +4,28 @@ cso_hgo.py
 Ireland in Data — CSO Health Graduate Outcomes ETL
 Downloads HGO tables from the CSO PxStat REST API and saves dated CSV snapshots.
 
-Tables collected:
-  HGO07  Health graduates by institution and field of study (counts)
-  HGO08  Health graduates by institution, field and gender
-  HGO09  Graduate outcomes at 1,2,3,4,5 years post-graduation ("Not Captured" proxy)
-  HGO11  Graduate returns to Ireland
-  HGO15  Graduate earnings (if available)
-  HGO16  Graduate earnings by gender
+Tables collected (verified against CSO's own PxStat labels 2026-08-19 — the
+codes below are confirmed live and correctly matched; earlier drafts of this
+script had several wrong):
+  HGO07  "Number of Health Graduates"                    — counts, NO institution dimension
+  HGO09  "Health Graduate Outcomes"                       — the "Not Captured" proxy table
+  HGO11  "Number of Health Graduates that Returned to Ireland"
+  HGO15  "Graduate Earnings"
+
+Dropped from the original table list:
+  HGO08  Does not exist in CSO's PxStat catalog (404). There is no second
+         institution/gender-split counts table alongside HGO07.
+  HGO16  Exists, but is "Graduate Occupations in Census 2022", not "earnings
+         by gender" as originally assumed — no loader reads it, so it was
+         never actually used; dropped rather than left as a misleading label.
+
+Decision E004 (schema/create_education_schema.sql): fact_health_graduates is
+NATIONAL-LEVEL by design. HGO07's only dimensions are Graduation Year,
+Nationality, PPSN Validity, Gender, and Field of Study — no institution at
+all — and no other HGO table adds one. load_health_graduates() below does
+not attempt institution matching; institution_id is always NULL for
+CSO-sourced rows. This was a deliberate call (2026-08-19), not an oversight
+— see the schema file's decision log before revisiting it.
 
 Endpoint pattern (confirmed, public, no auth required):
   https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/{TABLE}/CSV/1.0/en
@@ -22,12 +37,12 @@ Decision E002: The "Not Captured" outcome in HGO09 is NOT confirmed emigration.
 CSO background notes state it means graduates not found in Irish employment or
 social insurance records. Always label as "not captured in Irish employment records".
 
-Decision (RCSI exclusion): HGO08 RCSI medicine graduates 2012–2016 must be loaded
+Decision (RCSI exclusion): HGO07 RCSI medicine graduates 2012–2016 must be loaded
 with data_excluded=True due to PPSN validation issues (documented in CSO background notes).
 
 Run:
   pip install requests pandas duckdb
-  python cso_hgo.py [--tables HGO08 HGO09] [--db path/to/ireland_in_data.duckdb]
+  python cso_hgo.py [--tables HGO07 HGO09] [--db path/to/education.duckdb]
 """
 
 import argparse
@@ -42,11 +57,13 @@ import pandas as pd
 # Configuration
 # ---------------------------------------------------------------------------
 CSO_BASE = "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset"
-TABLES = ["HGO07", "HGO08", "HGO09", "HGO11", "HGO15", "HGO16"]
-RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw" / "cso"
+TABLES = ["HGO07", "HGO09", "HGO11", "HGO15"]
+RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw" / "cso"
 TODAY = date.today().isoformat()
 
-# CSO institution name → our institution_id
+# CSO institution name → our institution_id. Currently unused — no CSO HGO
+# table has an institution dimension (Decision E004) — kept in case a future
+# per-institution source (HEA?) needs the same mapping.
 INSTITUTION_MAP = {
     "University College Dublin":             "UCD",
     "UCD":                                   "UCD",
@@ -62,13 +79,13 @@ INSTITUTION_MAP = {
     "RCSI":                                  "RCSI",
 }
 
-# RCSI data exclusion: HGO08, graduation years 2012–2016
+# RCSI data exclusion: HGO07, graduation years 2012–2016
 # Source: CSO background note on PPSN validation issues
 RCSI_EXCLUSION = {
-    "table": "HGO08",
+    "table": "HGO07",
     "institution": "RCSI",
     "years": list(range(2012, 2017)),
-    "reason": "RCSI PPSN validation issues 2012-2016 (CSO HGO08 background note)"
+    "reason": "RCSI PPSN validation issues 2012-2016 (CSO HGO07 background note)"
 }
 
 
@@ -99,28 +116,38 @@ def download_table(table_id: str) -> pd.DataFrame:
 
 def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
     """
-    Load HGO07 / HGO08 into fact_health_graduates.
+    Load HGO07 into fact_health_graduates. National-level only (Decision
+    E004) — institution_id is always NULL; HGO07 has no institution column
+    to read one from.
     Column names are inferred from the actual CSV — adjust mapping if CSO changes headers.
+
+    KNOWN LIMITATION — RCSI exclusion cannot be applied here: the CSO
+    background note says RCSI's medicine graduate data for 2012-2016 has
+    PPSN validation issues (RCSI_EXCLUSION above), but HGO07 has no
+    institution column to identify which rows are RCSI's, so there is no
+    way to flag or exclude them at the row level against this table. RCSI's
+    numbers for those years are baked into the national Medicine total
+    unflagged. Treat any national Medicine graduate_count for 2012-2016 as
+    carrying that caveat until a per-institution source is found.
     """
     # Normalise column names (CSO uses title-case with spaces)
     df.columns = [c.strip() for c in df.columns]
 
     # Identify likely column names (CSO headers vary slightly between tables)
     col_map = {
-        "institution":      next((c for c in df.columns if "institution" in c.lower()), None),
         "field":            next((c for c in df.columns if "field" in c.lower()), None),
         "gender":           next((c for c in df.columns if "gender" in c.lower() or "sex" in c.lower()), None),
         "year":             next((c for c in df.columns if "year" in c.lower()), None),
         "value":            next((c for c in df.columns if c.lower() in ("value", "statistic", "graduates")), None),
     }
     print(f"  Column mapping: {col_map}")
+    if table_id == RCSI_EXCLUSION["table"]:
+        print(f"  ⚠ {table_id} has no institution column — RCSI 2012-2016 exclusion "
+              f"cannot be applied at row level (see function docstring)")
 
     rows_loaded = 0
-    rows_excluded = 0
 
     for _, row in df.iterrows():
-        raw_inst = str(row.get(col_map["institution"], "")).strip()
-        institution_id = INSTITUTION_MAP.get(raw_inst)
         field = str(row.get(col_map["field"], "")).strip()
         gender = str(row.get(col_map["gender"], "")).strip() if col_map["gender"] else None
         year_raw = str(row.get(col_map["year"], "")).strip()
@@ -128,25 +155,15 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
         value_raw = str(row.get(col_map["value"], "")).strip()
         count = int(float(value_raw)) if value_raw.replace(".", "").isdigit() else None
 
-        # Check RCSI exclusion
-        excluded = False
-        excl_reason = None
-        if (table_id == RCSI_EXCLUSION["table"]
-                and raw_inst == "Royal College of Surgeons in Ireland"
-                and year in RCSI_EXCLUSION["years"]):
-            excluded = True
-            excl_reason = RCSI_EXCLUSION["reason"]
-            rows_excluded += 1
-
         conn.execute("""
             INSERT INTO fact_health_graduates
                 (institution_id, graduation_year, field_of_study, gender,
                  graduate_count, data_excluded, exclusion_reason, source_table, load_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_date)
-        """, [institution_id, year, field, gender, count, excluded, excl_reason, table_id])
+            VALUES (NULL, ?, ?, ?, ?, FALSE, NULL, ?, current_date)
+        """, [year, field, gender, count, table_id])
         rows_loaded += 1
 
-    print(f"  Loaded {rows_loaded} rows ({rows_excluded} excluded/flagged)")
+    print(f"  Loaded {rows_loaded} rows (national-level, institution_id NULL — Decision E004)")
 
 
 def load_graduate_outcomes(df: pd.DataFrame, table_id: str, conn):
@@ -244,7 +261,7 @@ def main():
             print(f"  ERROR downloading {table_id}: {e}")
             continue
 
-        if conn and table_id in ("HGO07", "HGO08"):
+        if conn and table_id == "HGO07":
             load_health_graduates(df, table_id, conn)
         elif conn and table_id == "HGO09":
             load_graduate_outcomes(df, table_id, conn)

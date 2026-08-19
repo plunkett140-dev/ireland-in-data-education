@@ -54,7 +54,7 @@ from playwright.async_api import async_playwright, TimeoutError as PlaywrightTim
 # Configuration
 # ---------------------------------------------------------------------------
 HEA_URL = "https://highereducationauthority.shinyapps.io/Enrolments25/"
-RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw" / "hea"
+RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw" / "hea"
 TODAY = date.today().isoformat()
 
 # The field-of-study value we want for medicine (confirmed visible in DOM)
