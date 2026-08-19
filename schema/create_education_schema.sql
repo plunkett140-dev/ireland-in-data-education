@@ -69,17 +69,19 @@ CREATE INDEX IF NOT EXISTS idx_enrol_field   ON fact_student_enrolments(isced_la
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Fact: Health Graduates by Institution (CSO HGO08)
+-- Fact: Health Graduates (CSO HGO07 — national-level, Decision E004)
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS fact_health_graduates (
     institution_id      VARCHAR REFERENCES dim_institution(institution_id),
     graduation_year     INTEGER NOT NULL,   -- e.g. 2023
     field_of_study      VARCHAR NOT NULL,   -- CSO field label
-    gender              VARCHAR,
+    gender              VARCHAR,            -- 'Male', 'Female', or 'All genders' (a total row, not a third category)
+    nationality          VARCHAR,           -- 'All Irish', 'Non-Irish', or 'All nationalities' (a total row) —
+                                             -- HGO07's only nationality split; NOT an EU/Non-EU breakdown
     graduate_count      INTEGER,
     data_excluded       BOOLEAN DEFAULT FALSE,
     exclusion_reason    VARCHAR,            -- e.g. 'RCSI PPSN validation issues 2012-2016 (CSO background note)'
-    source_table        VARCHAR NOT NULL,   -- e.g. 'HGO08'
+    source_table        VARCHAR NOT NULL,   -- e.g. 'HGO07'
     load_date           DATE NOT NULL DEFAULT current_date
 );
 
@@ -98,7 +100,11 @@ CREATE TABLE IF NOT EXISTS fact_graduate_outcomes (
     field_of_study          VARCHAR NOT NULL,
     graduation_year         INTEGER NOT NULL,
     years_since_graduation  INTEGER NOT NULL,  -- 1, 2, 3, 4, 5
-    outcome_category        VARCHAR NOT NULL,  -- 'Employment', 'Further Study', 'Not Captured', etc.
+    outcome_category        VARCHAR NOT NULL,  -- 'Employment only', 'Employment and Education',
+                                                -- 'Education only', 'Neither Employment nor Education',
+                                                -- 'Not Captured', or 'All Graduate Outcomes' (a total row)
+    gender                  VARCHAR,           -- 'Male', 'Female', or 'All genders' (a total row)
+                                                -- HGO09 has NO nationality dimension — cannot be gender x nationality
     graduate_count          INTEGER,
     pct_of_cohort           NUMERIC(5,2),
     source_table            VARCHAR NOT NULL,  -- 'HGO09'
@@ -155,27 +161,30 @@ INSERT OR IGNORE INTO fact_programme_fees VALUES
 -- UCC 2025/26 — confirmed from official fee schedule euundergraduatefees202526
 -- CK791 row: €15,500 tuition + €207 capitation = €15,707
 -- Clinical placement contribution €750/yr applies additionally in years 2–4
+-- annual_fee_eur is BASE tuition only (Decision, 2026-08-19): total_annual_fee
+-- = annual_fee_eur + student_contrib + other_mandatory, so the add-on columns
+-- must not already be folded into annual_fee_eur or the total double-counts.
 INSERT OR IGNORE INTO fact_programme_fees VALUES
-    ('UCC', '2025/26', 'GEM', 'EU GEM', 15707.00, NULL, 207.00, NULL,
+    ('UCC', '2025/26', 'GEM', 'EU GEM', 15500.00, NULL, 207.00, NULL,
      'https://www.ucc.ie/en/financeoffice/fees/schedules/euundergraduatefees202526/',
      'scraper', '2026-08-19',
-     '€15,500 tuition + €207 capitation. Clinical placement fee €750/yr additional in years 2–4 (not in annual_fee_eur).');
+     '€15,500 tuition + €207 capitation = €15,707 total. Clinical placement fee €750/yr additional in years 2–4 (not in annual_fee_eur).');
 
 -- UL 2025/26 — confirmed from official programme fees page (year label not shown; assumed current)
 -- €15,820 tuition + €104 levy = €15,924
 INSERT OR IGNORE INTO fact_programme_fees VALUES
-    ('UL', '2025/26', 'GEM', 'EU GEM', 15924.00, 104.00, NULL, NULL,
+    ('UL', '2025/26', 'GEM', 'EU GEM', 15820.00, 104.00, NULL, NULL,
      'https://www.ul.ie/study/undergraduate/medicine-graduate-entry/fees-and-funding',
      'scraper', '2026-08-19',
-     '€15,820 tuition + €104 student levy. Healthcare screening €350 and iPad ~€600 additional Year 1 costs.');
+     '€15,820 tuition + €104 student levy = €15,924 total. Healthcare screening €350 and iPad ~€600 additional Year 1 costs.');
 
 -- RCSI 2025/26 — confirmed from official GEM fees page
 -- Tuition €15,080 + student contribution €1,000 + IT fee €475 + health screening €380 (yr1) + NUI fee €135 (yr1) = €17,070
 INSERT OR IGNORE INTO fact_programme_fees VALUES
-    ('RCSI', '2025/26', 'GEM', 'EU GEM', 17070.00, 1000.00, 990.00, NULL,
+    ('RCSI', '2025/26', 'GEM', 'EU GEM', 15080.00, 1000.00, 990.00, NULL,
      'https://www.rcsi.com/dublin/undergraduate/gem/fees-and-funding',
      'scraper', '2026-08-19',
-     '€15,080 tuition + €1,000 student contribution + €475 IT fee + €380 health screening (yr1 only) + €135 NUI fee (yr1 only). other_mandatory = €475 ongoing annual; yr1 total higher.');
+     '€15,080 tuition + €1,000 student contribution + €475 IT fee + €380 health screening (yr1 only) + €135 NUI fee (yr1 only) = €17,070 total. other_mandatory = €475 ongoing annual; yr1 total higher.');
 
 -- University of Galway: UG medicine only (not GEM), €7,408 p.a. 2026/27
 INSERT OR IGNORE INTO fact_programme_fees VALUES

@@ -1,0 +1,728 @@
+<title>Medicine Access &amp; Cost</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+
+<style>
+  :root {
+    --bg: #fbfbf7;
+    --surface: #ffffff;
+    --surface-sunken: #f2f4f0;
+    --ink: #16211c;
+    --ink-secondary: #4a5750;
+    --ink-muted: #7c847d;
+    --border: rgba(22, 33, 28, 0.11);
+    --border-strong: rgba(22, 33, 28, 0.20);
+    --primary: #169b62;
+    --primary-fill: rgba(22, 155, 98, 0.16);
+    --secondary: #d9541f;
+    --secondary-fill: rgba(217, 84, 31, 0.16);
+    --tertiary: #7b4fa0;
+    --tertiary-fill: rgba(123, 79, 160, 0.16);
+    --neutral-series: #9aa39c;
+    --neutral-series-fill: rgba(154, 163, 156, 0.18);
+    --focus-ring: #2c6e8c;
+    --shadow: 0 1px 2px rgba(22, 33, 28, 0.06), 0 8px 24px -12px rgba(22, 33, 28, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10201a;
+      --surface: #172922;
+      --surface-sunken: #0d1a15;
+      --ink: #eef3ef;
+      --ink-secondary: #b8c4be;
+      --ink-muted: #82938b;
+      --border: rgba(238, 243, 239, 0.13);
+      --border-strong: rgba(238, 243, 239, 0.24);
+      --primary: #2fc37f;
+      --primary-fill: rgba(47, 195, 127, 0.18);
+      --secondary: #f1783f;
+      --secondary-fill: rgba(241, 120, 63, 0.18);
+      --tertiary: #a980d4;
+      --tertiary-fill: rgba(169, 128, 212, 0.2);
+      --neutral-series: #8b968f;
+      --neutral-series-fill: rgba(139, 150, 143, 0.2);
+      --focus-ring: #6fb2d6;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10201a;
+    --surface: #172922;
+    --surface-sunken: #0d1a15;
+    --ink: #eef3ef;
+    --ink-secondary: #b8c4be;
+    --ink-muted: #82938b;
+    --border: rgba(238, 243, 239, 0.13);
+    --border-strong: rgba(238, 243, 239, 0.24);
+    --primary: #2fc37f;
+    --primary-fill: rgba(47, 195, 127, 0.18);
+    --secondary: #f1783f;
+    --secondary-fill: rgba(241, 120, 63, 0.18);
+    --tertiary: #a980d4;
+    --tertiary-fill: rgba(169, 128, 212, 0.2);
+    --neutral-series: #8b968f;
+    --neutral-series-fill: rgba(139, 150, 143, 0.2);
+    --focus-ring: #6fb2d6;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .page { max-width: 940px; margin: 0 auto; }
+
+  h1, h2, h3 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  header.masthead { margin-bottom: 2rem; }
+
+  .eyebrow {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 0 0 0.6rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 2.7rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.6rem;
+  }
+
+  .dek { color: var(--ink-secondary); font-size: 1.08rem; max-width: 66ch; margin: 0; }
+
+  .scope-note {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.85rem 1rem;
+    margin-top: 1.1rem;
+    font-size: 0.86rem;
+    color: var(--ink-secondary);
+    max-width: 66ch;
+  }
+  .scope-note strong { color: var(--ink); }
+
+  /* ---- Summary tiles ---- */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 2rem 0 3rem;
+  }
+  .tile { background: var(--surface); padding: 1.15rem 1.3rem; }
+  .tile-label { font-size: 0.78rem; color: var(--ink-muted); margin: 0 0 0.4rem; }
+  .tile-value {
+    font-family: "Source Sans 3", sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+  .tile-value .a-primary { color: var(--primary); }
+  .tile-value .a-secondary { color: var(--secondary); }
+  .tile-sub { font-size: 0.82rem; color: var(--ink-muted); margin-top: 0.25rem; }
+
+  /* ---- Sections ---- */
+  section.group { margin-bottom: 3rem; }
+  .group-head { margin-bottom: 1.1rem; }
+  .group-head h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .group-head .group-num {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+  .group-head p { margin: 0.35rem 0 0; color: var(--ink-secondary); font-size: 0.95rem; max-width: 68ch; }
+
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 720px) { .chart-row { grid-template-columns: 1fr; } }
+
+  article.chart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+  article.chart.full { grid-column: 1 / -1; }
+
+  .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .chart-head h3 { font-size: 1.05rem; font-weight: 500; }
+  .chart-head p { margin: 0.25rem 0 0; color: var(--ink-muted); font-size: 0.82rem; max-width: 44ch; }
+
+  button.toggle-table {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.35rem 0.65rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.toggle-table:hover { border-color: var(--border-strong); }
+  button.toggle-table:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  .chart-wrap { overflow-x: auto; position: relative; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+
+  .axis text { font-family: "Source Sans 3", sans-serif; font-size: 11.5px; fill: var(--ink-muted); }
+  .gridline { stroke: var(--border); stroke-width: 1; }
+
+  .bar-value { font-family: "Source Sans 3", sans-serif; font-variant-numeric: tabular-nums; font-size: 11.5px; font-weight: 600; fill: var(--ink); }
+  .bar-label { font-family: "Source Sans 3", sans-serif; font-size: 12px; fill: var(--ink-secondary); }
+
+  .hover-target { cursor: crosshair; }
+  .crosshair-line { stroke: var(--ink-muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; }
+  .dot-marker { fill: var(--surface); stroke-width: 2; opacity: 0; pointer-events: none; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 0.75rem; font-size: 0.8rem; color: var(--ink-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 0.78rem;
+    font-family: "Source Sans 3", sans-serif;
+    padding: 0.5rem 0.7rem;
+    border-radius: 7px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 10px));
+    white-space: nowrap;
+    z-index: 5;
+    transition: opacity 0.08s ease;
+  }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 0.4rem; }
+  .tooltip .tt-swatch { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+  .tooltip .tt-label { color: var(--bg); opacity: 0.7; }
+  .tooltip strong { font-variant-numeric: tabular-nums; }
+
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 0.25rem; }
+  table.data-table th, table.data-table td { text-align: right; padding: 0.4rem 0.55rem; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  table.data-table th:first-child, table.data-table td:first-child { text-align: left; font-variant-numeric: normal; }
+  table.data-table th { color: var(--ink-muted); font-weight: 600; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .hidden { display: none; }
+
+  .foot-note { font-size: 0.78rem; color: var(--ink-muted); border-top: 1px solid var(--border); padding-top: 0.8rem; margin-top: 1rem; }
+
+  footer.page-foot { color: var(--ink-muted); font-size: 0.83rem; text-align: center; margin-top: 2.5rem; }
+
+  @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">Ireland in Data · Education</p>
+    <h1>Medicine access &amp; cost</h1>
+    <p class="dek">Who trains to be a doctor in Ireland, what it costs, and where they go afterwards — gender, nationality, and post-graduation outcomes, from the education pipeline's first live-loaded data.</p>
+    <div class="scope-note">
+      <span>ⓘ</span>
+      <span><strong>Scope note:</strong> HEA's enrolment dashboard can't isolate Medicine specifically — its narrowest field is "Health &amp; Welfare" (nursing, pharmacy, dentistry etc. included). Sections 2 and 4 use CSO graduate data, which <em>can</em> isolate Medicine. Section 3 is Health &amp; Welfare broadly, labeled as such throughout.</span>
+    </div>
+  </header>
+
+  <div class="tiles">
+    <div class="tile">
+      <p class="tile-label">GEM annual fee range, 2025/26</p>
+      <p class="tile-value"><span class="a-primary">€15,707</span>–€18,800</p>
+      <p class="tile-sub">UCC lowest, UCD highest</p>
+    </div>
+    <div class="tile">
+      <p class="tile-label">Medicine graduates, 2022</p>
+      <p class="tile-value"><span class="a-primary">714</span> <span class="a-secondary">/ 540</span></p>
+      <p class="tile-sub">female / male, national (CSO)</p>
+    </div>
+    <div class="tile">
+      <p class="tile-label">Not in Irish records, year 2 post-grad</p>
+      <p class="tile-value"><span class="a-secondary">15.7%</span></p>
+      <p class="tile-sub">2018 cohort — see Section 4 caveat</p>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 1: FEES ============ -->
+  <section class="group" id="sec-fees">
+    <div class="group-head">
+      <h2><span class="group-num">01</span> What it costs</h2>
+      <p>Graduate Entry Medicine annual fees by institution, 2025/26.</p>
+    </div>
+    <article class="chart full">
+      <div class="chart-head">
+        <div>
+          <h3>GEM fees by institution</h3>
+          <p>Total annual fee: tuition + capitation + mandatory charges</p>
+        </div>
+        <button class="toggle-table" data-target="table-fees" aria-expanded="false">View as table</button>
+      </div>
+      <div class="chart-wrap"><svg id="svg-fees" viewBox="0 0 880 260" role="img" aria-label="Bar chart of GEM annual fees by institution, 2025/26"></svg></div>
+      <table class="data-table hidden" id="table-fees"><thead><tr><th>Institution</th><th>Total annual fee</th></tr></thead><tbody></tbody></table>
+      <p class="foot-note">Source: institution fee schedules, scraped 2026-08-19 (<code>etl/fee_scraper.py</code>). RCSI includes one-time Year 1 costs; ongoing annual cost is slightly lower.</p>
+    </article>
+  </section>
+
+  <!-- ============ SECTION 2: WHO STUDIES MEDICINE (graduates) ============ -->
+  <section class="group" id="sec-who">
+    <div class="group-head">
+      <h2><span class="group-num">02</span> Who becomes a doctor</h2>
+      <p>National Medicine graduate counts by gender and by nationality, 2010–2022 (CSO Higher Education Outcomes).</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>By gender</h3><p>Medicine graduates per year</p></div>
+          <button class="toggle-table" data-target="table-grad-gender" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-grad-gender" viewBox="0 0 420 280" role="img" aria-label="Grouped bar chart of Medicine graduates by gender, 2010 to 2022"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Female</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Male</span>
+        </div>
+        <table class="data-table hidden" id="table-grad-gender"><thead><tr><th>Year</th><th>Female</th><th>Male</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>By nationality</h3><p>Medicine graduates per year</p></div>
+          <button class="toggle-table" data-target="table-grad-nat" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-grad-nat" viewBox="0 0 420 280" role="img" aria-label="Grouped bar chart of Medicine graduates by nationality, 2010 to 2022"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Irish</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Non-Irish</span>
+        </div>
+        <table class="data-table hidden" id="table-grad-nat"><thead><tr><th>Year</th><th>Irish</th><th>Non-Irish</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note">Source: CSO HGO07, downloaded 2026-08-19. "Non-Irish" is CSO's only nationality split for this table — it does not distinguish EU from non-EU nationals. Female graduates have outnumbered male graduates in every year since 2010.</p>
+  </section>
+
+  <!-- ============ SECTION 3: HEALTH & WELFARE ENROLMENTS ============ -->
+  <section class="group" id="sec-enrol">
+    <div class="group-head">
+      <h2><span class="group-num">03</span> Current students, broader context</h2>
+      <p>Health &amp; Welfare field enrolments (nursing, pharmacy, medicine and more combined — HEA's narrowest field-of-study filter) by domicile and gender, 2018/19–2024/25.</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>By domicile</h3><p>Health &amp; Welfare enrolments</p></div>
+          <button class="toggle-table" data-target="table-domicile" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-domicile" viewBox="0 0 420 280" role="img" aria-label="Stacked area chart of Health and Welfare enrolments by domicile group"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Ireland</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>EU</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Non-EU</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Other (GB/NI/unknown)</span>
+        </div>
+        <table class="data-table hidden" id="table-domicile"><thead><tr><th>Year</th><th>Ireland</th><th>EU</th><th>Non-EU</th><th>Other</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>By gender</h3><p>Health &amp; Welfare enrolments</p></div>
+          <button class="toggle-table" data-target="table-enrol-gender" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-enrol-gender" viewBox="0 0 420 280" role="img" aria-label="Stacked area chart of Health and Welfare enrolments by gender"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Female</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Male</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Non-binary</span>
+        </div>
+        <table class="data-table hidden" id="table-enrol-gender"><thead><tr><th>Year</th><th>Female</th><th>Male</th><th>Non-binary</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note">Source: HEA enrolments dashboard, downloaded 2026-08-19 (<code>etl/hea_enrolments.py</code> → <code>hea_csv_loader.py</code>). Non-EU includes Great Britain in neither group per HEA's own "Domicile Group" categories, shown separately with Northern Ireland and Unknown as "Other" here. EU is a genuine small minority (720 of 46,320 in 2024/25) next to Ireland's ~38,600.</p>
+  </section>
+
+  <!-- ============ SECTION 4: POST-GRADUATION OUTCOMES ============ -->
+  <section class="group" id="sec-outcomes">
+    <div class="group-head">
+      <h2><span class="group-num">04</span> Where they go after graduating</h2>
+      <p>Medicine graduates, class of 2018, outcome mix by years since graduation (CSO HGO09).</p>
+    </div>
+    <article class="chart full">
+      <div class="chart-head">
+        <div>
+          <h3>Outcome trajectory, 2018 Medicine graduates</h3>
+          <p>Share of cohort found in Irish employment records vs. not captured, year by year</p>
+        </div>
+        <button class="toggle-table" data-target="table-outcomes" aria-expanded="false">View as table</button>
+      </div>
+      <div class="chart-wrap"><svg id="svg-outcomes" viewBox="0 0 880 300" role="img" aria-label="Stacked area chart of Medicine graduate outcomes by years since graduation for the 2018 cohort"></svg></div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>In Irish employment</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Not captured in Irish records</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Other (in Ireland, not working/studying)</span>
+      </div>
+      <table class="data-table hidden" id="table-outcomes"><thead><tr><th>Years since graduation</th><th>In employment</th><th>Not captured</th><th>Other</th></tr></thead><tbody></tbody></table>
+      <p class="foot-note"><strong>Reading this carefully:</strong> "Not captured" means the graduate wasn't found in Irish employment or social insurance records that year — CSO's own background note is explicit that this is <em>not</em> confirmed emigration; some may be on career breaks, unemployed, or missed by the matching process. It is the closest available proxy for "left the system," not proof of it. Year 1 (mandatory HSE intern year) is near-universal employment; year 2 is the first year graduates are free to pursue further training anywhere, which is where this data shows the sharpest shift. Neither CSO nor HEA publish employer-level data, so nothing here can say how many specifically work for the HSE. Source: CSO HGO09, downloaded 2026-08-19.</p>
+    </article>
+  </section>
+
+  <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
+</div>
+
+<script>
+(function () {
+  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function fmt(n) { return n.toLocaleString('en-IE'); }
+  function euro(n) { return '€' + n.toLocaleString('en-IE'); }
+  function pct(n) { return n.toFixed(1) + '%'; }
+  var ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) {
+    var e = document.createElementNS(ns, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  document.querySelectorAll('.toggle-table').forEach(function (btn) {
+    var openLabel = btn.textContent.trim();
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.target);
+      var nowHidden = !target.classList.contains('hidden'); // about to hide it
+      target.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', String(!nowHidden));
+      btn.textContent = nowHidden ? openLabel : 'Hide';
+    });
+  });
+
+  function makeTooltip(containerEl) {
+    var tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    containerEl.style.position = 'relative';
+    containerEl.appendChild(tooltip);
+    return tooltip;
+  }
+
+  function positionTooltip(tooltip, svg, W, x, y) {
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / W;
+    tooltip.style.left = (x * scale) + 'px';
+    tooltip.style.top = (y * scale) + 'px';
+  }
+
+  // ================= CHART: Fees (single-series bar) =================
+  var fees = [
+    { label: 'UCC', value: 15707 }, { label: 'UL', value: 15924 },
+    { label: 'RCSI', value: 17070 }, { label: 'UCD', value: 18800 }
+  ];
+  (function renderFees() {
+    var svg = document.getElementById('svg-fees');
+    var W = 880, H = 260, padL = 60, padR = 20, padT = 20, padB = 40;
+    var plotW = W - padL - padR, plotH = H - padT - padB, maxVal = 20000;
+    var barGap = 32, barW = (plotW - barGap * (fees.length - 1)) / fees.length;
+    var primary = cssVar('--primary');
+    [0, 5000, 10000, 15000, 20000].forEach(function (v) {
+      var y = padT + plotH - (v / maxVal) * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' });
+      t.textContent = v === 0 ? '€0' : euro(v); svg.appendChild(t);
+    });
+    var tooltip = makeTooltip(document.getElementById('sec-fees').querySelector('.chart-wrap'));
+    var tbody = document.querySelector('#table-fees tbody');
+    fees.forEach(function (d, i) {
+      var x = padL + i * (barW + barGap), barH = (d.value / maxVal) * plotH, y = padT + plotH - barH, r = 4;
+      var path = el('path', {
+        d: 'M' + x + ',' + (y + r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+           ' L' + (x + barW - r) + ',' + y + ' Q' + (x + barW) + ',' + y + ' ' + (x + barW) + ',' + (y + r) +
+           ' L' + (x + barW) + ',' + (padT + plotH) + ' L' + x + ',' + (padT + plotH) + ' Z',
+        fill: primary
+      });
+      svg.appendChild(path);
+      var hit = el('rect', { x: x, y: padT, width: barW, height: plotH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+      var vl = el('text', { class: 'bar-value', x: x + barW / 2, y: y - 10, 'text-anchor': 'middle' }); vl.textContent = euro(d.value); svg.appendChild(vl);
+      var nl = el('text', { class: 'bar-label', x: x + barW / 2, y: padT + plotH + 24, 'text-anchor': 'middle' }); nl.textContent = d.label; svg.appendChild(nl);
+      hit.addEventListener('mouseenter', function (ev) {
+        path.setAttribute('opacity', '0.85');
+        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>' + euro(d.value) + '</strong> / year';
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, x + barW / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+      var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td><td>' + euro(d.value) + '</td>'; tbody.appendChild(tr);
+    });
+  })();
+
+  // ================= Generic grouped bar chart (2 series) =================
+  function renderGroupedBar(svgId, data, seriesKeys, colors, tableSelector, tooltipUnit) {
+    var svg = document.getElementById(svgId);
+    var W = 420, H = 280, padL = 46, padR = 12, padT = 16, padB = 34;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var rawMax = Math.max.apply(null, data.map(function (d) { return Math.max(d[seriesKeys[0]], d[seriesKeys[1]]); })) * 1.12;
+    // Round up to a "nice" step (nearest 200 here, given these are all
+    // hundreds-scale values) so gridlines read as round numbers, not 769.
+    var niceStep = 200;
+    var maxVal = Math.ceil(rawMax / niceStep) * niceStep;
+    var groupGap = 6, groupW = plotW / data.length;
+    var barW = (groupW - groupGap * 3) / 2;
+
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = (maxVal / steps) * s;
+      var y = padT + plotH - (v / maxVal) * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 8, y: y + 4, 'text-anchor': 'end' }); t.textContent = fmt(Math.round(v)); svg.appendChild(t);
+    }
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var gx = padL + i * groupW + groupGap;
+      seriesKeys.forEach(function (key, si) {
+        var val = d[key];
+        var x = gx + si * (barW + groupGap);
+        var barH = (val / maxVal) * plotH;
+        var y = padT + plotH - barH;
+        var r = 3;
+        var path = el('path', {
+          d: 'M' + x + ',' + (y + r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+             ' L' + (x + barW - r) + ',' + y + ' Q' + (x + barW) + ',' + y + ' ' + (x + barW) + ',' + (y + r) +
+             ' L' + (x + barW) + ',' + (padT + plotH) + ' L' + x + ',' + (padT + plotH) + ' Z',
+          fill: colors[si]
+        });
+        svg.appendChild(path);
+        var hit = el('rect', { x: x, y: padT, width: barW, height: plotH, fill: 'transparent', class: 'hover-target' });
+        svg.appendChild(hit);
+        hit.addEventListener('mouseenter', function () {
+          path.setAttribute('opacity', '0.8');
+          tooltip.innerHTML = '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + d.label + ' — ' + key + '</span></div><strong>' + fmt(val) + '</strong>' + (tooltipUnit || '');
+          tooltip.style.opacity = '1';
+          positionTooltip(tooltip, svg, W, x + barW / 2, y);
+        });
+        hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+      });
+      // x-axis label every other year to avoid crowding on narrow charts
+      if (i % 2 === 0 || data.length <= 8) {
+        var lbl = el('text', { class: 'axis', x: gx + groupW / 2 - groupGap / 2, y: padT + plotH + 20, 'text-anchor': 'middle' });
+        lbl.textContent = d.label; svg.appendChild(lbl);
+      }
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>' + fmt(d[seriesKeys[0]]) + '</td><td>' + fmt(d[seriesKeys[1]]) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  var gradGender = [
+    { label: '2010', Female: 429, Male: 354 }, { label: '2011', Female: 417, Male: 321 },
+    { label: '2012', Female: 318, Male: 249 }, { label: '2013', Female: 504, Male: 429 },
+    { label: '2014', Female: 519, Male: 498 }, { label: '2015', Female: 540, Male: 570 },
+    { label: '2016', Female: 630, Male: 534 }, { label: '2017', Female: 609, Male: 582 },
+    { label: '2018', Female: 657, Male: 597 }, { label: '2019', Female: 705, Male: 516 },
+    { label: '2020', Female: 681, Male: 588 }, { label: '2021', Female: 729, Male: 576 },
+    { label: '2022', Female: 714, Male: 540 }
+  ];
+  renderGroupedBar('svg-grad-gender', gradGender, ['Female', 'Male'], [cssVar('--primary'), cssVar('--secondary')], '#table-grad-gender', ' graduates');
+
+  var gradNat = [
+    { label: '2010', Irish: 327, 'Non-Irish': 456 }, { label: '2011', Irish: 387, 'Non-Irish': 351 },
+    { label: '2012', Irish: 348, 'Non-Irish': 219 }, { label: '2013', Irish: 540, 'Non-Irish': 393 },
+    { label: '2014', Irish: 594, 'Non-Irish': 423 }, { label: '2015', Irish: 687, 'Non-Irish': 423 },
+    { label: '2016', Irish: 660, 'Non-Irish': 504 }, { label: '2017', Irish: 678, 'Non-Irish': 513 },
+    { label: '2018', Irish: 672, 'Non-Irish': 579 }, { label: '2019', Irish: 594, 'Non-Irish': 627 },
+    { label: '2020', Irish: 642, 'Non-Irish': 627 }, { label: '2021', Irish: 678, 'Non-Irish': 627 },
+    { label: '2022', Irish: 636, 'Non-Irish': 618 }
+  ];
+  renderGroupedBar('svg-grad-nat', gradNat, ['Irish', 'Non-Irish'], [cssVar('--primary'), cssVar('--secondary')], '#table-grad-nat', ' graduates');
+
+  // ================= Generic stacked area chart =================
+  function renderStackedArea(svgId, data, seriesKeys, colors, tableSelector, opts) {
+    opts = opts || {};
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal;
+    var W = vb.width, H = vb.height;
+    var padL = opts.padL || 46, padR = 12, padT = 16, padB = 34;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var totals = data.map(function (d) { return seriesKeys.reduce(function (s, k) { return s + d[k]; }, 0); });
+    var maxTotal;
+    if (opts.pctMode) {
+      // Stacked percentages sum to 100 — headroom would push the top
+      // gridline past 100%, which is meaningless for a percentage axis.
+      maxTotal = 100;
+    } else {
+      var rawMax = Math.max.apply(null, totals) * 1.08;
+      var niceStep = rawMax > 10000 ? 5000 : 500;
+      maxTotal = Math.ceil(rawMax / niceStep) * niceStep;
+    }
+
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var v = (maxTotal / steps) * s;
+      var y = padT + plotH - (v / maxTotal) * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 8, y: y + 4, 'text-anchor': 'end' });
+      t.textContent = opts.pctMode ? Math.round(v) + '%' : fmt(Math.round(v));
+      svg.appendChild(t);
+    }
+
+    function xPos(i) { return data.length === 1 ? padL + plotW / 2 : padL + (i / (data.length - 1)) * plotW; }
+
+    // Compute cumulative baselines per series, per point
+    var cum = data.map(function () { return 0; });
+    var layers = seriesKeys.map(function (key) {
+      var points = data.map(function (d, i) {
+        var base = cum[i];
+        var top = base + d[key];
+        cum[i] = top;
+        return { base: base, top: top, val: d[key] };
+      });
+      return { key: key, points: points };
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+
+    layers.forEach(function (layer, li) {
+      var topPts = layer.points.map(function (p, i) { return xPos(i) + ',' + (padT + plotH - (p.top / maxTotal) * plotH); }).join(' ');
+      var botPts = layer.points.map(function (p, i) { return xPos(data.length - 1 - i) + ',' + (padT + plotH - (layer.points[data.length - 1 - i].base / maxTotal) * plotH); }).join(' ');
+      var areaPath = 'M' + topPts.split(' ').join(' L') + ' L' + botPts.split(' ').join(' L') + ' Z';
+      svg.appendChild(el('path', { d: areaPath, fill: colors[li], opacity: '0.88' }));
+      svg.appendChild(el('polyline', {
+        points: topPts, fill: 'none', stroke: colors[li], 'stroke-width': '1.5',
+        'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+      }));
+    });
+
+    // On narrow charts with many points, showing every label crowds them
+    // into each other once the edges are anchored start/end (they no
+    // longer share the "centered, evenly-spaced" layout that prevented
+    // overlap). Thin to every other point when there's not enough room —
+    // roughly 55px per point is the practical floor for these label widths.
+    // Edge labels are anchored start/end (full label width extends into
+    // the neighboring gap), not just middle (half width each side) — so
+    // the safe spacing threshold is bigger than it looks. 65px covers the
+    // 7-point/420px-wide charts here (~58px spacing) while leaving the
+    // 5-point/880px-wide chart (~207px spacing) untouched.
+    var showEvery = (plotW / (data.length - 1)) < 65 ? 2 : 1;
+    data.forEach(function (d, i) {
+      var isEdge = i === 0 || i === data.length - 1;
+      if (!isEdge && i % showEvery !== 0) return;
+      // First/last labels anchor to start/end instead of middle so they
+      // don't overhang the viewBox edge and get clipped.
+      var anchor = i === 0 ? 'start' : (i === data.length - 1 ? 'end' : 'middle');
+      var t = el('text', { class: 'axis', x: xPos(i), y: padT + plotH + 20, 'text-anchor': anchor });
+      t.textContent = opts.xLabel ? opts.xLabel(d, i) : d.label;
+      svg.appendChild(t);
+    });
+
+    var crosshair = el('line', { class: 'crosshair-line', x1: 0, x2: 0, y1: padT, y2: padT + plotH });
+    svg.appendChild(crosshair);
+    var overlay = el('rect', { x: padL, y: padT, width: plotW, height: plotH, fill: 'transparent', class: 'hover-target' });
+    svg.appendChild(overlay);
+
+    overlay.addEventListener('mousemove', function (ev) {
+      var rect = svg.getBoundingClientRect();
+      var scale = W / rect.width;
+      var mx = (ev.clientX - rect.left) * scale;
+      var idx = data.length === 1 ? 0 : Math.round(((mx - padL) / plotW) * (data.length - 1));
+      idx = Math.max(0, Math.min(data.length - 1, idx));
+      var px = xPos(idx);
+      crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = '1';
+
+      var rows = seriesKeys.map(function (key, si) {
+        var val = data[idx][key];
+        var display = opts.pctMode ? pct(val) : fmt(val);
+        return '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + key + '</span> <strong>' + display + '</strong></div>';
+      }).join('');
+      tooltip.innerHTML = '<div style="margin-bottom:4px;font-weight:600">' + (opts.xLabel ? opts.xLabel(data[idx], idx) : data[idx].label) + '</div>' + rows;
+      tooltip.style.opacity = '1';
+      positionTooltip(tooltip, svg, W, px, padT + plotH * 0.3);
+    });
+    overlay.addEventListener('mouseleave', function () { crosshair.style.opacity = '0'; tooltip.style.opacity = '0'; });
+
+    var tbody = document.querySelector(tableSelector + ' tbody');
+    data.forEach(function (d, i) {
+      var cells = seriesKeys.map(function (k) { return '<td>' + (opts.pctMode ? pct(d[k]) : fmt(d[k])) + '</td>'; }).join('');
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + (opts.xLabel ? opts.xLabel(d, i) : d.label) + '</td>' + cells;
+      tbody.appendChild(tr);
+    });
+  }
+
+  var domicile = [
+    { label: "'18/19", Ireland: 34495, EU: 295, 'Non-EU': 5135, Other: 880 },
+    { label: "'19/20", Ireland: 35240, EU: 335, 'Non-EU': 5125, Other: 695 },
+    { label: "'20/21", Ireland: 37540, EU: 355, 'Non-EU': 5140, Other: 710 },
+    { label: "'21/22", Ireland: 37635, EU: 415, 'Non-EU': 5565, Other: 775 },
+    { label: "'22/23", Ireland: 36525, EU: 495, 'Non-EU': 6025, Other: 675 },
+    { label: "'23/24", Ireland: 37535, EU: 680, 'Non-EU': 6215, Other: 655 },
+    { label: "'24/25", Ireland: 38625, EU: 720, 'Non-EU': 6380, Other: 595 }
+  ];
+  renderStackedArea('svg-domicile', domicile, ['Ireland', 'EU', 'Non-EU', 'Other'],
+    [cssVar('--primary'), cssVar('--tertiary'), cssVar('--secondary'), cssVar('--neutral-series')], '#table-domicile',
+    { padL: 58 });
+
+  var enrolGender = [
+    { label: "'18/19", Female: 31010, Male: 9780, 'Non-binary': 5 },
+    { label: "'19/20", Female: 31415, Male: 9970, 'Non-binary': 15 },
+    { label: "'20/21", Female: 33525, Male: 10195, 'Non-binary': 20 },
+    { label: "'21/22", Female: 33875, Male: 10430, 'Non-binary': 90 },
+    { label: "'22/23", Female: 33225, Male: 10320, 'Non-binary': 175 },
+    { label: "'23/24", Female: 34330, Male: 10580, 'Non-binary': 170 },
+    { label: "'24/25", Female: 35405, Male: 10725, 'Non-binary': 185 }
+  ];
+  renderStackedArea('svg-enrol-gender', enrolGender, ['Female', 'Male', 'Non-binary'],
+    [cssVar('--primary'), cssVar('--secondary'), cssVar('--neutral-series')], '#table-enrol-gender',
+    { padL: 58 });
+
+  // Outcomes as PERCENTAGES of cohort (more legible than raw counts here)
+  var outcomesRaw = [
+    { year: 1, employed: 636, notCaptured: 15, other: 3 },
+    { year: 2, employed: 429, notCaptured: 102, other: 120 },
+    { year: 3, employed: 456, notCaptured: 159, other: 39 },
+    { year: 4, employed: 516, notCaptured: 105, other: 33 },
+    { year: 5, employed: 519, notCaptured: 117, other: 18 }
+  ];
+  var outcomesPct = outcomesRaw.map(function (d) {
+    var total = d.employed + d.notCaptured + d.other;
+    return {
+      label: 'Year ' + d.year,
+      'In Irish employment': +(100 * d.employed / total).toFixed(1),
+      'Not captured': +(100 * d.notCaptured / total).toFixed(1),
+      'Other': +(100 * d.other / total).toFixed(1)
+    };
+  });
+  renderStackedArea('svg-outcomes', outcomesPct, ['In Irish employment', 'Not captured', 'Other'],
+    [cssVar('--primary'), cssVar('--secondary'), cssVar('--neutral-series')], '#table-outcomes',
+    { pctMode: true, padL: 50 });
+})();
+</script>

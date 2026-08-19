@@ -46,6 +46,7 @@ Run:
 """
 
 import argparse
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -90,6 +91,31 @@ RCSI_EXCLUSION = {
 
 
 # ---------------------------------------------------------------------------
+# Shared value parsing
+# ---------------------------------------------------------------------------
+
+def safe_int(val):
+    """CSO VALUE cells can be NaN for suppressed/missing figures, or blank.
+    float('nan') parses without error but int(nan) raises — and the older
+    `int(x) or None` idiom used elsewhere in this file silently turns a
+    genuine 0 into NULL, which is a real (if usually harmless) data bug.
+    This returns None only for actually-missing values, and 0 stays 0."""
+    try:
+        f = float(str(val).strip())
+        return None if f != f else int(f)  # f != f is the NaN check
+    except (TypeError, ValueError):
+        return None
+
+
+def safe_float(val):
+    try:
+        f = float(str(val).strip())
+        return None if f != f else f
+    except (TypeError, ValueError):
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Download
 # ---------------------------------------------------------------------------
 
@@ -121,6 +147,17 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
     to read one from.
     Column names are inferred from the actual CSV — adjust mapping if CSO changes headers.
 
+    HGO07 has TWO dimensions this loader must handle carefully or every row
+    gets multiplied:
+      Nationality:   'All Irish', 'Non-Irish', 'All nationalities' (a total)
+      PPSN Validity: 'PPSN - All', 'PPSN - Available', 'PPSN - Missing'
+    'PPSN - Available'/'PPSN - Missing' further split each Nationality x
+    Gender cell — we don't need that split, so only 'PPSN - All' rows are
+    loaded (dropping the other two prevents inserting 3x too many rows, a
+    real bug found and fixed 2026-08-19 — every (year, gender) cell was
+    getting 9 rows instead of the intended few). Nationality itself has NO
+    EU/Non-EU split — 'Non-Irish' is everyone who isn't Irish, undifferentiated.
+
     KNOWN LIMITATION — RCSI exclusion cannot be applied here: the CSO
     background note says RCSI's medicine graduate data for 2012-2016 has
     PPSN validation issues (RCSI_EXCLUSION above), but HGO07 has no
@@ -137,6 +174,8 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
     col_map = {
         "field":            next((c for c in df.columns if "field" in c.lower()), None),
         "gender":           next((c for c in df.columns if "gender" in c.lower() or "sex" in c.lower()), None),
+        "nationality":      next((c for c in df.columns if "nationality" in c.lower()), None),
+        "ppsn":             next((c for c in df.columns if "ppsn" in c.lower()), None),
         "year":             next((c for c in df.columns if "year" in c.lower()), None),
         "value":            next((c for c in df.columns if c.lower() in ("value", "statistic", "graduates")), None),
     }
@@ -145,11 +184,18 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
         print(f"  ⚠ {table_id} has no institution column — RCSI 2012-2016 exclusion "
               f"cannot be applied at row level (see function docstring)")
 
+    if col_map["ppsn"]:
+        before = len(df)
+        df = df[df[col_map["ppsn"]] == "PPSN - All"]
+        print(f"  Filtered to PPSN Validity == 'PPSN - All': {before} -> {len(df)} rows "
+              f"(dropping the PPSN-Available/PPSN-Missing split we don't need)")
+
     rows_loaded = 0
 
     for _, row in df.iterrows():
         field = str(row.get(col_map["field"], "")).strip()
         gender = str(row.get(col_map["gender"], "")).strip() if col_map["gender"] else None
+        nationality = str(row.get(col_map["nationality"], "")).strip() if col_map["nationality"] else None
         year_raw = str(row.get(col_map["year"], "")).strip()
         year = int(year_raw) if year_raw.isdigit() else None
         value_raw = str(row.get(col_map["value"], "")).strip()
@@ -157,10 +203,10 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
 
         conn.execute("""
             INSERT INTO fact_health_graduates
-                (institution_id, graduation_year, field_of_study, gender,
+                (institution_id, graduation_year, field_of_study, gender, nationality,
                  graduate_count, data_excluded, exclusion_reason, source_table, load_date)
-            VALUES (NULL, ?, ?, ?, ?, FALSE, NULL, ?, current_date)
-        """, [year, field, gender, count, table_id])
+            VALUES (NULL, ?, ?, ?, ?, ?, FALSE, NULL, ?, current_date)
+        """, [year, field, gender, nationality, count, table_id])
         rows_loaded += 1
 
     print(f"  Loaded {rows_loaded} rows (national-level, institution_id NULL — Decision E004)")
@@ -169,7 +215,15 @@ def load_health_graduates(df: pd.DataFrame, table_id: str, conn):
 def load_graduate_outcomes(df: pd.DataFrame, table_id: str, conn):
     """
     Load HGO09 into fact_graduate_outcomes.
-    Includes "Not Captured" rows — must never be relabelled as emigration.
+    Includes "Not Captured" rows — must never be relabelled as emigration
+    (Decision E002): it means "not found in Irish employment or social
+    insurance records", not confirmed emigration.
+
+    HGO09 has no PPSN Validity / Nationality dimension (unlike HGO07), so
+    there's no equivalent row-explosion risk here — every row is loaded.
+    "All Graduate Outcomes" and "All genders" are real rows too (totals
+    alongside their breakdowns) — consumers must filter those out rather
+    than sum the whole table.
     """
     df.columns = [c.strip() for c in df.columns]
 
@@ -178,6 +232,7 @@ def load_graduate_outcomes(df: pd.DataFrame, table_id: str, conn):
         "grad_year":        next((c for c in df.columns if "graduation" in c.lower() and "year" in c.lower()), None),
         "years_since":      next((c for c in df.columns if "years since" in c.lower() or "year after" in c.lower()), None),
         "outcome":          next((c for c in df.columns if "outcome" in c.lower() or "status" in c.lower()), None),
+        "gender":           next((c for c in df.columns if "gender" in c.lower() or "sex" in c.lower()), None),
         "count":            next((c for c in df.columns if c.lower() in ("value", "count", "graduates")), None),
         "pct":              next((c for c in df.columns if "%" in c or "percent" in c.lower()), None),
     }
@@ -187,15 +242,16 @@ def load_graduate_outcomes(df: pd.DataFrame, table_id: str, conn):
         conn.execute("""
             INSERT INTO fact_graduate_outcomes
                 (field_of_study, graduation_year, years_since_graduation,
-                 outcome_category, graduate_count, pct_of_cohort, source_table, load_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, current_date)
+                 outcome_category, gender, graduate_count, pct_of_cohort, source_table, load_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_date)
         """, [
             str(row.get(col_map["field"], "")).strip(),
-            int(str(row.get(col_map["grad_year"], 0)).strip() or 0) or None,
-            int(str(row.get(col_map["years_since"], 0)).strip() or 0) or None,
+            safe_int(row.get(col_map["grad_year"])),
+            safe_int(row.get(col_map["years_since"])),
             str(row.get(col_map["outcome"], "")).strip(),
-            int(float(str(row.get(col_map["count"], "")).strip() or 0)) or None,
-            float(str(row.get(col_map["pct"], "")).strip() or 0) or None,
+            str(row.get(col_map["gender"], "")).strip() if col_map["gender"] else None,
+            safe_int(row.get(col_map["count"])),
+            safe_float(row.get(col_map["pct"])) if col_map["pct"] else None,
             table_id,
         ])
 
@@ -203,28 +259,50 @@ def load_graduate_outcomes(df: pd.DataFrame, table_id: str, conn):
 
 
 def load_graduate_returns(df: pd.DataFrame, table_id: str, conn):
-    """Load HGO11 into fact_graduate_returns."""
+    """
+    Load HGO11 into fact_graduate_returns.
+
+    HGO11's "Years not captured" column holds text like '1 year', '13
+    years', and 'All Years' (a total row) — not plain integers. 'All Years'
+    rows are dropped (a derived aggregate across the 1-13 breakdown, same
+    reasoning as dropping HEA's "TOTAL" rows) since years_since_return is
+    NOT NULL and there's no meaningful integer to store for it anyway.
+    """
     df.columns = [c.strip() for c in df.columns]
     col_map = {
         "field":         next((c for c in df.columns if "field" in c.lower()), None),
         "grad_year":     next((c for c in df.columns if "graduation" in c.lower() and "year" in c.lower()), None),
-        "years_return":  next((c for c in df.columns if "return" in c.lower()), None),
+        "years_return":  next((c for c in df.columns if "not captured" in c.lower() or "return" in c.lower()), None),
         "count":         next((c for c in df.columns if c.lower() in ("value", "count", "graduates")), None),
     }
+    print(f"  Column mapping: {col_map}")
+
+    def parse_years(val):
+        """'1 year' -> 1, '13 years' -> 13, 'All Years' -> None (caller skips)."""
+        m = re.match(r"^\s*(\d+)\s*years?\s*$", str(val), re.IGNORECASE)
+        return int(m.group(1)) if m else None
+
+    skipped_all_years = 0
+    rows_loaded = 0
 
     for _, row in df.iterrows():
+        years = parse_years(row.get(col_map["years_return"]))
+        if years is None:
+            skipped_all_years += 1
+            continue
         conn.execute("""
             INSERT INTO fact_graduate_returns
                 (field_of_study, graduation_year, years_since_return, returner_count, source_table, load_date)
             VALUES (?, ?, ?, ?, ?, current_date)
         """, [
             str(row.get(col_map["field"], "")).strip(),
-            int(str(row.get(col_map["grad_year"], 0)).strip() or 0) or None,
-            int(str(row.get(col_map["years_return"], 0)).strip() or 0) or None,
-            int(float(str(row.get(col_map["count"], "")).strip() or 0)) or None,
+            safe_int(row.get(col_map["grad_year"])),
+            years,
+            safe_int(row.get(col_map["count"])),
             table_id,
         ])
-    print(f"  Loaded {len(df)} rows")
+        rows_loaded += 1
+    print(f"  Loaded {rows_loaded} rows ({skipped_all_years} 'All Years' row(s) dropped)")
 
 
 # ---------------------------------------------------------------------------

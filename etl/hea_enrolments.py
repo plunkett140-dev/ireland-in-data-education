@@ -35,8 +35,14 @@ Run:
   python hea_enrolments.py
 
 Output:
-  data/raw/hea/hea_enrolments_health_welfare_YYYY-MM-DD.csv
-  data/raw/hea/hea_enrolments_all_fields_YYYY-MM-DD.csv  (optional full snapshot)
+  data/raw/hea/hea_enrolments_health_welfare_YYYY-MM-DD.csv        Programme Type x academic year
+  data/raw/hea/hea_enrolments_domicile_YYYY-MM-DD.csv              Domicile Group x academic year
+  data/raw/hea/hea_enrolments_gender_YYYY-MM-DD.csv                Gender x academic year
+  data/raw/hea/hea_enrolments_medicine_institutions_YYYY-MM-DD.csv Programme Type x academic year, medicine institutions only
+All four are Health and welfare field only, each a different Row Variable
+breakdown of the SAME underlying population (except the last, which also
+narrows institutions) — see hea_csv_loader.py's module docstring before
+combining them.
 
 Decision E001: it is unknown whether HEA data distinguishes UG from GEM medicine within
 "Health and welfare". After the first download, inspect the Programme Type column.
@@ -145,8 +151,14 @@ async def scrape_hea():
         page = await context.new_page()
 
         print(f"Loading {HEA_URL} ...")
-        await page.goto(HEA_URL, wait_until="networkidle", timeout=120_000)
-        await wait_for_shiny(page)
+        # NOTE: wait_until="networkidle" is unreliable against this app —
+        # its websocket keeps the connection looking "busy" indefinitely, so
+        # networkidle sometimes never fires and goto() times out at 120s
+        # (observed repeatedly 2026-08-19). domcontentloaded + waiting for
+        # window.Shiny to exist is the reliable signal instead.
+        await page.goto(HEA_URL, wait_until="domcontentloaded", timeout=60_000)
+        await page.wait_for_function("window.Shiny !== undefined", timeout=60_000)
+        await page.wait_for_timeout(5000)  # let Shiny finish its initial render
         print("  Shiny app ready.")
 
         # ── Open both accordion panels ──────────────────────────────────────
@@ -172,8 +184,36 @@ async def scrape_hea():
             f"hea_enrolments_health_welfare_{TODAY}.csv"
         )
 
-        # ── Download 2: Medicine institutions only (belt-and-braces) ────────
-        print("Filtering to medicine institutions ...")
+        # ── Download 2: same scope, Row Variable → Domicile Group ───────────
+        # Ireland / (Other) EU / Non-EU / Great Britain / Northern Ireland /
+        # Unknown — still all institutions, still Health and welfare.
+        print("Setting Row Variable → Domicile Group ...")
+        await set_shiny_input(page, "Single_row_select", "Domicile Group")
+        await wait_for_shiny(page)
+
+        print("Downloading domicile-group snapshot ...")
+        await download_current_view(
+            page,
+            f"hea_enrolments_domicile_{TODAY}.csv"
+        )
+
+        # ── Download 3: same scope, Row Variable → Gender ────────────────────
+        print("Setting Row Variable → Gender ...")
+        await set_shiny_input(page, "Single_row_select", "Gender")
+        await wait_for_shiny(page)
+
+        print("Downloading gender snapshot ...")
+        await download_current_view(
+            page,
+            f"hea_enrolments_gender_{TODAY}.csv"
+        )
+
+        # ── Download 4: Medicine institutions only (belt-and-braces) ────────
+        # Back to Row Variable → Programme Type for this one, matching the
+        # first download's shape.
+        print("Setting Row Variable → Programme Type, filtering to medicine institutions ...")
+        await set_shiny_input(page, "Single_row_select", "Programme Type")
+        await wait_for_shiny(page)
         await set_shiny_input(page, "Institute_filter_p1", MEDICINE_INSTITUTIONS)
         await wait_for_shiny(page)
 
