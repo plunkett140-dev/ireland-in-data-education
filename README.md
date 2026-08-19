@@ -16,21 +16,27 @@ outcomes for Irish medical education.
   narrowest field-of-study filter is "Health and welfare" (nursing,
   pharmacy, dentistry etc. included).
 - **CSO graduate data** — national-level Medicine (and other health field)
-  graduate counts by gender and nationality, plus post-graduation outcome
-  mix by years-since-graduation, from the CSO's Higher Education Outcomes
-  (HGO) PxStat tables. Unlike HEA, CSO data *can* isolate Medicine
-  specifically — but only at national level (Decision E004) and only with
-  gender/nationality, never combined institution-level.
+  graduate counts by gender and nationality, post-graduation outcome mix by
+  years-since-graduation, and (from CSO's Census 2022-matched release,
+  published 2025-11-14) public/private sector employment and occupation —
+  from the CSO's Higher Education Outcomes (HGO) PxStat tables. Unlike HEA,
+  CSO data *can* isolate Medicine specifically — but only at national level
+  (Decision E004) and never combined with institution.
+- **2022 is the current ceiling, not staleness in this pipeline.** CSO's
+  most recent graduate-counts table (HGO07) was itself last updated
+  2025-11-14 and still only covers graduation years 2010–2022 — that's the
+  frontier of what CSO has published, confirmed against their own release
+  notes, not a scrape running behind.
 
 ## Dashboard
 
 `dashboard/education-dashboard.html` — a static, self-contained page with
-6 charts across 4 sections (fees, who becomes a doctor, enrolments in
-broader context, post-graduation outcomes). Open it directly in a browser,
-or publish it wherever you publish Ireland in Data artifacts. Chart data is
-inlined from the queries in this README's history — re-run the queries
-below against a fresh `education.duckdb` and update the inline arrays at
-the bottom of the file to refresh it.
+8 charts across 5 sections (fees, who becomes a doctor, enrolments in
+broader context, post-graduation outcomes, public sector & occupation).
+Open it directly in a browser, or publish it wherever you publish Ireland
+in Data artifacts. Chart data is inlined from the queries in this README's
+history — re-run the queries below against a fresh `education.duckdb` and
+update the inline arrays at the bottom of the file to refresh it.
 
 ## Structure
 
@@ -69,8 +75,8 @@ python etl/hea_enrolments.py
 python etl/hea_csv_loader.py --inspect                              # safe, no writes
 python etl/hea_csv_loader.py --load --db data/education.duckdb
 
-# CSO graduate data — downloads + loads national-level counts/outcomes
-python etl/cso_hgo.py --tables HGO07 HGO09 HGO11 HGO15 --db data/education.duckdb
+# CSO graduate data — downloads + loads national-level counts/outcomes/sector/occupation
+python etl/cso_hgo.py --tables HGO07 HGO09 HGO11 HGO14 HGO15 HGO16 --db data/education.duckdb
 ```
 
 Useful queries once loaded (see `dashboard/education-dashboard.html` for
@@ -92,6 +98,17 @@ SELECT years_since_graduation, outcome_category, graduate_count
 FROM fact_graduate_outcomes
 WHERE field_of_study='Medicine' AND graduation_year=2018 AND gender='All genders'
   AND outcome_category != 'All Graduate Outcomes';
+
+-- Public vs private sector employment, one cohort (closest available HSE proxy)
+SELECT years_since_graduation, sector, graduate_count FROM fact_graduate_sector
+WHERE field_of_study='Medicine' AND graduation_year=2018 AND sector != 'All sectors';
+
+-- Share still working as Medical practitioners, Census 2022 snapshot, by cohort
+SELECT graduation_year,
+  SUM(CASE WHEN occupational_group='All occupational groups' THEN graduate_count END) AS total,
+  SUM(CASE WHEN occupational_group='Medical practitioners' THEN graduate_count END) AS doctors
+FROM fact_graduate_occupation WHERE field_of_study='Medicine'
+GROUP BY graduation_year ORDER BY graduation_year;
 ```
 
 ## Known issues
@@ -110,12 +127,24 @@ WHERE field_of_study='Medicine' AND graduation_year=2018 AND gender='All genders
   Health & Welfare broadly — not Medicine). Neither can be combined with
   the other, and `fact_graduate_outcomes` (HGO09) has no nationality
   dimension at all — outcome-by-nationality isn't obtainable from CSO.
-- **HSE-specific employment isn't in this data at all.** CSO's "Not
-  Captured" outcome category (Decision E002) means *not found in Irish
-  employment or social insurance records* — it is explicitly not confirmed
-  emigration, and neither CSO nor HEA publish employer-level data. Nothing
-  in this pipeline can currently say how many graduates work for the HSE
-  specifically. See Next steps below.
+- **HSE-specific employment still isn't in this data — "public sector" is
+  the closest proxy, not a stand-in.** Neither CSO nor HEA publish
+  employer-level data, so `fact_graduate_sector` (HGO14, added 2026-08-19)
+  can only say "public sector," which for a Medicine graduate in Ireland
+  overwhelmingly means the HSE system, but isn't verified as such. CSO's
+  "Not Captured" outcome category (Decision E002) still means *not found
+  in Irish employment or social insurance records* — explicitly not
+  confirmed emigration. See Next steps below for the HSE annual reports
+  lead, which might get genuinely employer-specific.
+- **`fact_graduate_occupation` (HGO16) is a single Census 2022 snapshot,
+  not a trajectory.** Each graduation-year cohort is observed at a
+  different number of years post-graduation (whatever elapsed by Census
+  night, 2022), and it only covers graduates who responded to Census 2022
+  and were matched — a much smaller population than the full graduating
+  cohort in `fact_health_graduates` (hundreds vs. the full 500-700+ per
+  cohort). It answers "of those we can see, what do they do?", not "of
+  everyone who graduated, what fraction still practise?" Don't join it to
+  the other fact tables expecting matching denominators.
 - **The HEA CSVs overlap, not add.** All four downloaded files cover the
   same national Health & Welfare population sliced by a different
   dimension (`medicine_institutions` also narrows institutions). Never
@@ -130,7 +159,15 @@ WHERE field_of_study='Medicine' AND graduation_year=2018 AND gender='All genders
 - **HSE annual reports** may publish employment figures for doctors and
   nurses by specialty and level of training, plus open-post data — and
   possibly nationality of hires. Worth checking whether that can fill the
-  "HSE-specific employment" gap above; not yet investigated or scraped.
+  "HSE-specific employment" gap above (public sector is a proxy, not the
+  real thing); not yet investigated or scraped.
+- **HGO17 (Graduate Regions of Employment)** — same Census 2022-matched
+  release as HGO14/16, dimension is literally "HSE Health Regions" (which
+  of 6 regions graduates work in). Checked its structure but not
+  downloaded, loaded, or charted — lower priority than sector/occupation,
+  would need its own fact table following the HGO16 pattern.
+- **HGO13 (Graduate NACE Sector of Employment)** — industry classification,
+  same release, not investigated in detail.
 - **HEA institution/gender/domicile combined cuts** — the current HEA
   downloads only ever break down by one dimension at a time (Row Variable
   is single-select in their dashboard). A combined view (e.g. domicile x

@@ -10,14 +10,19 @@ script had several wrong):
   HGO07  "Number of Health Graduates"                    — counts, NO institution dimension
   HGO09  "Health Graduate Outcomes"                       — the "Not Captured" proxy table
   HGO11  "Number of Health Graduates that Returned to Ireland"
-  HGO15  "Graduate Earnings"
+  HGO14  "Graduate Public/Private Sector of Employment"   — best available HSE-employment proxy (not HSE-specific)
+  HGO15  "Graduate Earnings"                              — no loader yet, raw file saved only
+  HGO16  "Graduate Occupations in Census 2022"             — one fixed snapshot, not a years-since trajectory
 
 Dropped from the original table list:
   HGO08  Does not exist in CSO's PxStat catalog (404). There is no second
          institution/gender-split counts table alongside HGO07.
-  HGO16  Exists, but is "Graduate Occupations in Census 2022", not "earnings
-         by gender" as originally assumed — no loader reads it, so it was
-         never actually used; dropped rather than left as a misleading label.
+
+Not yet loaded, added to the catalog alongside HGO14/16 (2026-08-19):
+  HGO13  "Graduate NACE Sector of Employment" — industry classification, could be a future addition
+  HGO17  "Graduate Regions of Employment" — dimension is literally "HSE Health Regions";
+         same Census-2022-snapshot caveat as HGO16. Lower priority than sector/occupation
+         for now, not loaded.
 
 Decision E004 (schema/create_education_schema.sql): fact_health_graduates is
 NATIONAL-LEVEL by design. HGO07's only dimensions are Graduation Year,
@@ -42,7 +47,7 @@ with data_excluded=True due to PPSN validation issues (documented in CSO backgro
 
 Run:
   pip install requests pandas duckdb
-  python cso_hgo.py [--tables HGO07 HGO09] [--db path/to/education.duckdb]
+  python cso_hgo.py [--tables HGO07 HGO09 HGO11 HGO14 HGO16] [--db path/to/education.duckdb]
 """
 
 import argparse
@@ -58,7 +63,7 @@ import pandas as pd
 # Configuration
 # ---------------------------------------------------------------------------
 CSO_BASE = "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset"
-TABLES = ["HGO07", "HGO09", "HGO11", "HGO15"]
+TABLES = ["HGO07", "HGO09", "HGO11", "HGO14", "HGO15", "HGO16"]
 RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw" / "cso"
 TODAY = date.today().isoformat()
 
@@ -305,6 +310,73 @@ def load_graduate_returns(df: pd.DataFrame, table_id: str, conn):
     print(f"  Loaded {rows_loaded} rows ({skipped_all_years} 'All Years' row(s) dropped)")
 
 
+def load_graduate_sector(df: pd.DataFrame, table_id: str, conn):
+    """
+    Load HGO14 into fact_graduate_sector. Public sector is the closest CSO
+    proxy for "works for the HSE" — see schema comment for the caveat that
+    it's not actually HSE-specific. 'All sectors' is a real total row
+    (verified = Public + Private exactly), loaded as-is.
+    """
+    df.columns = [c.strip() for c in df.columns]
+    col_map = {
+        "field":         next((c for c in df.columns if "field" in c.lower()), None),
+        "grad_year":     next((c for c in df.columns if "graduation" in c.lower() and "year" in c.lower()), None),
+        "years_since":   next((c for c in df.columns if "years since" in c.lower()), None),
+        "sector":        next((c for c in df.columns if "sector" in c.lower()), None),
+        "count":         next((c for c in df.columns if c.lower() in ("value", "count", "graduates")), None),
+    }
+    print(f"  Column mapping: {col_map}")
+
+    rows_loaded = 0
+    for _, row in df.iterrows():
+        conn.execute("""
+            INSERT INTO fact_graduate_sector
+                (field_of_study, graduation_year, years_since_graduation, sector, graduate_count, source_table, load_date)
+            VALUES (?, ?, ?, ?, ?, ?, current_date)
+        """, [
+            str(row.get(col_map["field"], "")).strip(),
+            safe_int(row.get(col_map["grad_year"])),
+            safe_int(row.get(col_map["years_since"])),
+            str(row.get(col_map["sector"], "")).strip(),
+            safe_int(row.get(col_map["count"])),
+            table_id,
+        ])
+        rows_loaded += 1
+    print(f"  Loaded {rows_loaded} rows")
+
+
+def load_graduate_occupation(df: pd.DataFrame, table_id: str, conn):
+    """
+    Load HGO16 into fact_graduate_occupation. A single Census-2022 snapshot,
+    not a years-since-graduation trajectory — see schema comment. 'All
+    occupational groups' is a real total row, loaded as-is.
+    """
+    df.columns = [c.strip() for c in df.columns]
+    col_map = {
+        "field":         next((c for c in df.columns if "field" in c.lower()), None),
+        "grad_year":     next((c for c in df.columns if "graduation" in c.lower() and "year" in c.lower()), None),
+        "occupation":    next((c for c in df.columns if "occupational group" in c.lower()), None),
+        "count":         next((c for c in df.columns if c.lower() in ("value", "count", "graduates")), None),
+    }
+    print(f"  Column mapping: {col_map}")
+
+    rows_loaded = 0
+    for _, row in df.iterrows():
+        conn.execute("""
+            INSERT INTO fact_graduate_occupation
+                (field_of_study, graduation_year, occupational_group, graduate_count, source_table, load_date)
+            VALUES (?, ?, ?, ?, ?, current_date)
+        """, [
+            str(row.get(col_map["field"], "")).strip(),
+            safe_int(row.get(col_map["grad_year"])),
+            str(row.get(col_map["occupation"], "")).strip(),
+            safe_int(row.get(col_map["count"])),
+            table_id,
+        ])
+        rows_loaded += 1
+    print(f"  Loaded {rows_loaded} rows")
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -345,6 +417,10 @@ def main():
             load_graduate_outcomes(df, table_id, conn)
         elif conn and table_id == "HGO11":
             load_graduate_returns(df, table_id, conn)
+        elif conn and table_id == "HGO14":
+            load_graduate_sector(df, table_id, conn)
+        elif conn and table_id == "HGO16":
+            load_graduate_occupation(df, table_id, conn)
         else:
             if conn:
                 print(f"  (No loader implemented for {table_id} — raw file saved only)")

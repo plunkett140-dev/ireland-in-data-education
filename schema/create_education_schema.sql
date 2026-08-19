@@ -129,6 +129,49 @@ CREATE TABLE IF NOT EXISTS fact_graduate_returns (
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- Fact: Graduate Sector of Employment (CSO HGO14) — added 2026-08-19
+-- Public sector is the best available proxy for "works for the HSE" in CSO
+-- data (there is no employer-level table anywhere) — but it is NOT
+-- HSE-specific; "Public sector" for a Medicine graduate is overwhelmingly
+-- HSE/public hospitals in practice, but the table itself doesn't say so.
+-- 'All sectors' = 'Private sector' + 'Public sector' exactly (verified);
+-- it's a real row, not a placeholder — don't double-count it.
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS fact_graduate_sector (
+    field_of_study          VARCHAR NOT NULL,
+    graduation_year         INTEGER NOT NULL,
+    years_since_graduation  INTEGER NOT NULL,
+    sector                  VARCHAR NOT NULL,  -- 'Public sector', 'Private sector', 'All sectors' (a total row)
+    graduate_count          INTEGER,
+    source_table            VARCHAR NOT NULL,  -- 'HGO14'
+    load_date               DATE NOT NULL DEFAULT current_date
+);
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Fact: Graduate Occupation, Census 2022-matched (CSO HGO16) — added 2026-08-19
+-- ONE fixed snapshot (Census 2022 night), not a years-since-graduation
+-- trajectory like the other fact tables — years elapsed varies by cohort
+-- (2010 cohort = ~12 years out, 2021 cohort = ~1 year out, all measured on
+-- the same Census night). Also a much smaller population than the full
+-- graduating cohort in fact_health_graduates — only graduates who
+-- responded to Census 2022 AND were matched are counted here, so this
+-- answers "of graduates we can see in Census 2022, what do they do?", not
+-- "of all graduates, what fraction still practise?".
+-- 'All occupational groups' = sum of every specific occupation (a total
+-- row, not a placeholder) — don't double-count it.
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS fact_graduate_occupation (
+    field_of_study       VARCHAR NOT NULL,
+    graduation_year      INTEGER NOT NULL,
+    occupational_group    VARCHAR NOT NULL,  -- e.g. 'Medical practitioners', 'All occupational groups' (a total)
+    graduate_count        INTEGER,
+    source_table          VARCHAR NOT NULL,  -- 'HGO16'
+    load_date             DATE NOT NULL DEFAULT current_date
+);
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Fact: Programme Fees (manual register — Source C)
 -- Decision E003: UCD GEM €18,800/year is student-verified ground truth (2025/26).
 -- All other rows have verified_by NULL until confirmed from primary source.

@@ -392,8 +392,39 @@
         <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Other (in Ireland, not working/studying)</span>
       </div>
       <table class="data-table hidden" id="table-outcomes"><thead><tr><th>Years since graduation</th><th>In employment</th><th>Not captured</th><th>Other</th></tr></thead><tbody></tbody></table>
-      <p class="foot-note"><strong>Reading this carefully:</strong> "Not captured" means the graduate wasn't found in Irish employment or social insurance records that year — CSO's own background note is explicit that this is <em>not</em> confirmed emigration; some may be on career breaks, unemployed, or missed by the matching process. It is the closest available proxy for "left the system," not proof of it. Year 1 (mandatory HSE intern year) is near-universal employment; year 2 is the first year graduates are free to pursue further training anywhere, which is where this data shows the sharpest shift. Neither CSO nor HEA publish employer-level data, so nothing here can say how many specifically work for the HSE. Source: CSO HGO09, downloaded 2026-08-19.</p>
+      <p class="foot-note"><strong>Reading this carefully:</strong> "Not captured" means the graduate wasn't found in Irish employment or social insurance records that year — CSO's own background note is explicit that this is <em>not</em> confirmed emigration; some may be on career breaks, unemployed, or missed by the matching process. It is the closest available proxy for "left the system," not proof of it. Year 1 (mandatory HSE intern year) is near-universal employment; year 2 is the first year graduates are free to pursue further training anywhere, which is where this data shows the sharpest shift. Neither CSO nor HEA publish employer-level data, so nothing here can directly identify HSE employment — Section 5 uses public-sector employment as the closest available proxy. Source: CSO HGO09, downloaded 2026-08-19.</p>
     </article>
+  </section>
+
+  <!-- ============ SECTION 5: PUBLIC SECTOR & OCCUPATION ============ -->
+  <section class="group" id="sec-sector">
+    <div class="group-head">
+      <h2><span class="group-num">05</span> Public sector employment &amp; occupation</h2>
+      <p>Added from CSO's Census 2022-matched release (published 2025-11-14): the closest available proxy for HSE employment, and whether graduates are still practising medicine.</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>Public vs. private sector</h3><p>Of Medicine graduates in Irish employment, 2018 cohort</p></div>
+          <button class="toggle-table" data-target="table-sector" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-sector" viewBox="0 0 420 280" role="img" aria-label="Stacked area chart of public versus private sector employment share for the 2018 Medicine cohort"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Public sector</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Private sector</span>
+        </div>
+        <table class="data-table hidden" id="table-sector"><thead><tr><th>Years since graduation</th><th>Public</th><th>Private</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>Still practising medicine?</h3><p>Share working as Medical practitioners, by cohort</p></div>
+          <button class="toggle-table" data-target="table-occupation" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-occupation" viewBox="0 0 420 280" role="img" aria-label="Bar chart of the share of Medicine graduates working as medical practitioners in Census 2022, by graduation year"></svg></div>
+        <table class="data-table hidden" id="table-occupation"><thead><tr><th>Graduation year</th><th>Medical practitioners</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note"><strong>Two different caveats here, not one:</strong> the sector chart (left) is "public sector," not literally "HSE" — CSO doesn't publish employer-level data, but for a Medicine graduate in Ireland, public sector overwhelmingly means the HSE hospital system. The occupation chart (right) is a single Census 2022 snapshot, not a trajectory — each cohort is measured at a different number of years post-graduation (2010 cohort ≈ 12 years out, 2021 cohort ≈ 1 year out), and it only covers graduates who responded to Census 2022 and were matched — a much smaller group than the full graduating cohort (e.g. 147–537 people per cohort here, versus 500-700+ actual graduates). It answers "of those we can see, are they still doctors?" (consistently yes, 92–98%), not "of everyone who graduated, what fraction still practise?" Source: CSO HGO14 and HGO16, downloaded 2026-08-19.</p>
   </section>
 
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
@@ -724,5 +755,70 @@
   renderStackedArea('svg-outcomes', outcomesPct, ['In Irish employment', 'Not captured', 'Other'],
     [cssVar('--primary'), cssVar('--secondary'), cssVar('--neutral-series')], '#table-outcomes',
     { pctMode: true, padL: 50 });
+
+  // ================= CHART: Public vs private sector (stacked %, 2018 cohort) =================
+  var sectorRaw = [
+    { year: 1, pub: 621, priv: 15 }, { year: 2, pub: 369, priv: 39 }, { year: 3, pub: 423, priv: 30 },
+    { year: 4, pub: 483, priv: 33 }, { year: 5, pub: 483, priv: 33 }
+  ];
+  var sectorPct = sectorRaw.map(function (d) {
+    var total = d.pub + d.priv;
+    return { label: 'Year ' + d.year, 'Public': +(100 * d.pub / total).toFixed(1), 'Private': +(100 * d.priv / total).toFixed(1) };
+  });
+  renderStackedArea('svg-sector', sectorPct, ['Public', 'Private'],
+    [cssVar('--primary'), cssVar('--tertiary')], '#table-sector', { pctMode: true, padL: 46 });
+
+  // ================= CHART: Medical practitioner share by cohort (single-series bar) =================
+  var occupation = [
+    { label: '2010', total: 147, docs: 135 }, { label: '2011', total: 177, docs: 171 },
+    { label: '2012', total: 183, docs: 168 }, { label: '2013', total: 267, docs: 246 },
+    { label: '2014', total: 288, docs: 276 }, { label: '2015', total: 423, docs: 405 },
+    { label: '2016', total: 387, docs: 375 }, { label: '2017', total: 429, docs: 414 },
+    { label: '2018', total: 372, docs: 366 }, { label: '2019', total: 285, docs: 276 },
+    { label: '2020', total: 267, docs: 261 }, { label: '2021', total: 537, docs: 522 }
+  ].map(function (d) { return { label: d.label, pct: +(100 * d.docs / d.total).toFixed(1), n: d.total }; });
+
+  (function renderOccupation() {
+    var svg = document.getElementById('svg-occupation');
+    var W = 420, H = 280, padL = 48, padR = 12, padT = 16, padB = 34;
+    var plotW = W - padL - padR, plotH = H - padT - padB, maxVal = 100;
+    var barGap = 6, barW = (plotW - barGap * (occupation.length - 1)) / occupation.length;
+    var primary = cssVar('--primary');
+
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      var y = padT + plotH - (v / maxVal) * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 8, y: y + 4, 'text-anchor': 'end' }); t.textContent = v + '%'; svg.appendChild(t);
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector('#table-occupation tbody');
+
+    occupation.forEach(function (d, i) {
+      var x = padL + i * (barW + barGap), barH = (d.pct / maxVal) * plotH, y = padT + plotH - barH, r = 2;
+      var path = el('path', {
+        d: 'M' + x + ',' + (y + r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+           ' L' + (x + barW - r) + ',' + y + ' Q' + (x + barW) + ',' + y + ' ' + (x + barW) + ',' + (y + r) +
+           ' L' + (x + barW) + ',' + (padT + plotH) + ' L' + x + ',' + (padT + plotH) + ' Z',
+        fill: primary
+      });
+      svg.appendChild(path);
+      var hit = el('rect', { x: x, y: padT, width: barW, height: plotH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+      hit.addEventListener('mouseenter', function () {
+        path.setAttribute('opacity', '0.8');
+        tooltip.innerHTML = '<span class="tt-label">Class of ' + d.label + '</span><br><strong>' + pct(d.pct) + '</strong> medical practitioners<br><span class="tt-label">n=' + d.n + ' matched in Census 2022</span>';
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, x + barW / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+      if (i % 2 === 0) {
+        var lbl = el('text', { class: 'axis', x: x + barW / 2, y: padT + plotH + 20, 'text-anchor': 'middle' });
+        lbl.textContent = d.label; svg.appendChild(lbl);
+      }
+      var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td><td>' + pct(d.pct) + '</td>'; tbody.appendChild(tr);
+    });
+  })();
 })();
 </script>
