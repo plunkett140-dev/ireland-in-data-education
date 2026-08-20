@@ -360,6 +360,35 @@
     <p class="foot-note">A snapshot for the top 12; a hand-picked trend for 3 specialties, not all ~40 (see SOURCES.md for why a full multi-year specialty grid wasn't built). "Psychiatry" was labeled "General Adult Psychiatry" in the 2023 report only — same underlying specialty. Radiology and Psychiatry's high raw counts partly reflect that they're large disciplines nationally, not necessarily the highest vacancy <em>rate</em>. Source: HSE Medical Workforce Reports 2022-23 (Table 5.5), 2023-24 (Table 15), 2024-25 (Table 15), 2025-26 (Table 14).</p>
   </section>
 
+  <!-- ============ SECTION 5: SALARY BANDS ============ -->
+  <section class="group" id="sec-salary">
+    <div class="group-head">
+      <h2><span class="group-num">05</span> What they're paid</h2>
+      <p>Official HSE consolidated salary scales, current as of 1 August 2025 — not from the Medical Workforce Reports (none of the seven contain pay figures at all), but from HSE's own separately-published pay scales document.</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot, 1 Aug 2025</p>
+        <div class="chart-head">
+          <div><h3>NCHD pay scale</h3><p>Intern through Senior Registrar</p></div>
+          <button class="toggle-table" data-target="table-salary-nchd" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-salary-nchd" viewBox="0 0 420 260" role="img" aria-label="Range bar chart of NCHD salary scales by grade from intern to senior registrar"></svg></div>
+        <table class="data-table hidden" id="table-salary-nchd"><thead><tr><th>Grade</th><th>Min</th><th>Max</th><th>Points</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Snapshot, 1 Aug 2025</p>
+        <div class="chart-head">
+          <div><h3>Consultant pay scale</h3><p>2023 Contract (Sláintecare, public-only)</p></div>
+          <button class="toggle-table" data-target="table-salary-consultant" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-salary-consultant" viewBox="0 0 420 260" role="img" aria-label="Range bar chart of consultant salary scales for the 2023 contract, clinical and academic tracks"></svg></div>
+        <table class="data-table hidden" id="table-salary-consultant"><thead><tr><th>Track</th><th>Min</th><th>Max</th><th>Points</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note"><strong>Two important gaps this doesn't cover:</strong> only about a third of currently serving consultants have signed the 2023 contract shown here — most remain on older contracts (2008 Type A/Type B, or the 1997 Revised Common Contract), which have a different structure (some permit private practice, category/region-dependent rates) and aren't charted here; see the source PDF's Consultant tab for those. And these are scale <em>points</em>, not a distribution of who actually earns what — this says what the bands are, not how many doctors sit at each point, or how allowances (on-call payments, up to €12,014/year on the most onerous rota; a €58,446 Clinical Directors' allowance; etc.) change take-home pay on top of base salary. Source: HSE "Health Sector Consolidated Salary Scales", effective 1 August 2025, <code>data/raw/hse/hse-consolidated-salary-scales-aug-2025.pdf</code> — Intern, SHO, Registrar, Specialist Registrar, and Senior Registrar scales (page ~4), Consultant Contract 2023 Clinical and Academic scales (page ~42).</p>
+  </section>
+
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
 </div>
 
@@ -506,6 +535,65 @@
 
       var tr = document.createElement('tr');
       tr.innerHTML = '<td>' + d.label + '</td><td>' + (opts.pctMode ? pct(d.value) : fmt(d.value)) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ================= Generic range bar (min-max band per category) =================
+  function renderRangeBar(svgId, data, color, tableSelector) {
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = 150, padR = 20, padT = 22, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var globalMax = Math.max.apply(null, data.map(function (d) { return d.max; }));
+    var globalMin = Math.min.apply(null, data.map(function (d) { return d.min; }));
+    var pad = (globalMax - globalMin) * 0.12 || globalMax * 0.05;
+    var axisMin = Math.max(0, globalMin - pad), axisMax = globalMax + pad;
+    var barGap = 10, barH = (plotH - barGap * (data.length - 1)) / data.length;
+
+    function xPos(v) { return padL + ((v - axisMin) / (axisMax - axisMin)) * plotW; }
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var v = axisMin + f * (axisMax - axisMin);
+      var x = padL + f * plotW;
+      svg.appendChild(el('line', { class: 'gridline', x1: x, x2: x, y1: padT, y2: padT + plotH }));
+      var t = el('text', { class: 'axis', x: x, y: padT + plotH + 16, 'text-anchor': 'middle' });
+      t.textContent = '€' + Math.round(v / 1000) + 'k'; svg.appendChild(t);
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var y = padT + i * (barH + barGap);
+      var x1 = xPos(d.min), x2 = xPos(d.max);
+      var w = Math.max(x2 - x1, 4);
+      var r = barH / 2.2;
+      var path = el('rect', { x: x1, y: y, width: w, height: barH, rx: r, ry: r, fill: color });
+      svg.appendChild(path);
+      var hit = el('rect', { x: x1 - 4, y: y, width: w + 8, height: barH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+
+      var lbl = el('text', { class: 'bar-label', x: padL - 10, y: y + barH / 2 + 4, 'text-anchor': 'end' });
+      lbl.textContent = d.label; svg.appendChild(lbl);
+      var minLbl = el('text', { class: 'bar-value', x: x1, y: y - 6, 'text-anchor': 'middle' });
+      minLbl.textContent = '€' + fmt(d.min); svg.appendChild(minLbl);
+      if (d.max !== d.min) {
+        var maxLbl = el('text', { class: 'bar-value', x: x2, y: y - 6, 'text-anchor': 'middle' });
+        maxLbl.textContent = '€' + fmt(d.max); svg.appendChild(maxLbl);
+      }
+
+      hit.addEventListener('mouseenter', function () {
+        path.setAttribute('opacity', '0.8');
+        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>€' + fmt(d.min) + (d.max !== d.min ? ' – €' + fmt(d.max) : '') + '</strong>' + (d.points ? '<br><span class="tt-label">' + d.points + ' points</span>' : '');
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, (x1 + x2) / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>€' + fmt(d.min) + '</td><td>€' + fmt(d.max) + '</td><td>' + (d.points || '') + '</td>';
       tbody.appendChild(tr);
     });
   }
@@ -809,5 +897,25 @@
   ];
   renderLines('svg-specialty-trend', specialtyTrend, ['Radiology', 'Psychiatry', 'Emergency Medicine'],
     [cssVar('--primary'), cssVar('--secondary'), cssVar('--tertiary')], '#table-specialty-trend');
+
+  // ============================================================
+  // SECTION 5 DATA — official HSE pay scales, effective 1 Aug 2025
+  // ============================================================
+  var salaryNchd = [
+    { label: 'Intern', min: 46160, max: 46160, points: 1 },
+    { label: 'Senior House Officer', min: 54203, max: 74133, points: 7 },
+    { label: 'Registrar', min: 68891, max: 81126, points: 6 },
+    { label: 'Specialist Registrar', min: 77234, max: 96158, points: 7 },
+    { label: 'Senior Registrar', min: 82195, max: 100597, points: 7 }
+  ];
+  renderRangeBar('svg-salary-nchd', salaryNchd, cssVar('--primary'), '#table-salary-nchd');
+
+  var salaryConsultant = [
+    { label: 'Clinician', min: 233527, max: 280513, points: 6 },
+    { label: 'Academic Senior Lecturer', min: 251577, max: 305407, points: 6 },
+    { label: 'Academic Associate Professor', min: 269261, max: 325057, points: 6 },
+    { label: 'Academic Professor', min: 287029, max: 344798, points: 6 }
+  ];
+  renderRangeBar('svg-salary-consultant', salaryConsultant, cssVar('--secondary'), '#table-salary-consultant');
 })();
 </script>
