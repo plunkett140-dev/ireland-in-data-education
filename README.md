@@ -28,7 +28,7 @@ outcomes for Irish medical education.
   frontier of what CSO has published, confirmed against their own release
   notes, not a scrape running behind.
 
-## Dashboard
+## Dashboards
 
 `dashboard/education-dashboard.html` — a static, self-contained page with
 8 charts across 5 sections (fees, who becomes a doctor, enrolments in
@@ -37,6 +37,19 @@ Open it directly in a browser, or publish it wherever you publish Ireland
 in Data artifacts. Chart data is inlined from the queries in this README's
 history — re-run the queries below against a fresh `education.duckdb` and
 update the inline arrays at the bottom of the file to refresh it.
+
+`dashboard/hse-workforce-dashboard.html` — a second, separate static
+dashboard covering six years (2019/20–2024/25) of HSE's own annual Medical
+Workforce Reports: consultant/NCHD/NTSD headcount growth, the vacant
+consultant posts spike-then-fall (179 → 445 → 309), NTSD country of
+graduation since 2022 (Pakistan overtaking Ireland as the largest single
+source), and 2024's specialty-level vacancy breakdown. Not built from the
+DuckDB pipeline — HSE publishes dense annual PDFs, not an API or clean
+CSVs, so this data was pulled by hand from six PDFs (see
+`data/raw/hse/SOURCES.md` for the exact table/figure citation behind every
+number, including one real cross-report data revision worth knowing
+about) rather than scraped. Chart data is inlined the same way as the
+education dashboard — update the arrays in the file directly to refresh.
 
 ## Structure
 
@@ -51,8 +64,10 @@ schema/
 data/raw/
   hea/                Raw HEA enrolment CSV snapshots (programme type, domicile, gender)
   cso/                Raw CSO HGO CSV snapshots
+  hse/                Six years of HSE Medical Workforce Report PDFs + SOURCES.md citations
 dashboard/
-  education-dashboard.html   Static chart dashboard, see above
+  education-dashboard.html      Static chart dashboard, see above
+  hse-workforce-dashboard.html  HSE workforce dashboard, see above
 ```
 
 ## Setup
@@ -156,11 +171,17 @@ GROUP BY graduation_year ORDER BY graduation_year;
 
 ## Next steps
 
-- **HSE annual reports** may publish employment figures for doctors and
-  nurses by specialty and level of training, plus open-post data — and
-  possibly nationality of hires. Worth checking whether that can fill the
-  "HSE-specific employment" gap above (public sector is a proxy, not the
-  real thing); not yet investigated or scraped.
+- **HSE Medical Workforce Reports — done for 2019/20–2024/25, more
+  possible.** See `dashboard/hse-workforce-dashboard.html`. Not yet done:
+  the pre-2019 "Annual Assessment of NCHD Posts" years (2010–2018/19,
+  NCHD-only, different report structure — would extend the NCHD-side
+  trends further back but has no consultant/vacancy data to add); a
+  specialty-level vacancy *trend* (currently just the 2024 snapshot —
+  each year has an equivalent table, not yet reconciled across years);
+  and the newly-published 2025/26 report, which came out after this data
+  pull. This still doesn't answer "how many doctors work for the HSE
+  specifically by nationality" — NTSD country-of-graduation is the closest
+  HSE gets, and it's a subset of NCHDs, not the full workforce.
 - **HGO17 (Graduate Regions of Employment)** — same Census 2022-matched
   release as HGO14/16, dimension is literally "HSE Health Regions" (which
   of 6 regions graduates work in). Checked its structure but not
