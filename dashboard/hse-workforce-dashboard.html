@@ -79,7 +79,7 @@
     padding: 2.5rem 1.5rem 4rem;
   }
 
-  .page { max-width: 940px; margin: 0 auto; }
+  .page { max-width: 1000px; margin: 0 auto; }
 
   h1, h2, h3 {
     font-family: "Fraunces", Georgia, serif;
@@ -132,9 +132,18 @@
   .group-head .group-num { font-family: "Source Sans 3", sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--ink-muted); }
   .group-head p { margin: 0.35rem 0 0; color: var(--ink-secondary); font-size: 0.95rem; max-width: 68ch; }
 
+  .chart-row { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 1.25rem; align-items: stretch; }
+  @media (max-width: 780px) { .chart-row { grid-template-columns: 1fr; } }
+
   article.chart {
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
     box-shadow: var(--shadow); padding: 1.5rem 1.5rem 1.25rem;
+    display: flex; flex-direction: column;
+  }
+
+  .chart-kicker {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--ink-muted); margin: 0 0 0.3rem;
   }
 
   .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -149,7 +158,7 @@
   button.toggle-table:hover { border-color: var(--border-strong); }
   button.toggle-table:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
-  .chart-wrap { overflow-x: auto; position: relative; }
+  .chart-wrap { overflow-x: auto; position: relative; flex: 1; }
   .chart-wrap svg { display: block; width: 100%; height: auto; }
 
   .axis text { font-family: "Source Sans 3", sans-serif; font-size: 11.5px; fill: var(--ink-muted); }
@@ -193,29 +202,29 @@
 
   <header class="masthead">
     <p class="eyebrow">Ireland in Data · HSE Workforce</p>
-    <h1>The medical workforce, in six years</h1>
-    <p class="dek">HSE publishes a dense, ~100-page Medical Workforce Report every year — full of real, specific numbers on doctor supply, vacancies, and who's filling the gaps. Almost nobody reads the whole thing. This pulls six years of it into one page.</p>
+    <h1>The medical workforce, in seven years</h1>
+    <p class="dek">HSE publishes a dense, ~100-page Medical Workforce Report every year — full of real, specific numbers on doctor supply, vacancies, and who's filling the gaps. Almost nobody reads the whole thing. This pulls seven years of it into one page: where things stand right now, and how they got there.</p>
     <div class="scope-note">
       <span>ⓘ</span>
-      <span><strong>Scope note:</strong> 2019/20–2024/25 only — the years the report consistently covers both NCHDs and Consultants (it was NCHD-only before, under a different title, back to 2010). HSE's own site was down when this was pulled; every figure here traces to a specific table/figure in a specific year's PDF — see <code>data/raw/hse/SOURCES.md</code> for exact citations, including one real data revision worth knowing about.</span>
+      <span><strong>Scope note:</strong> 2019/20–2025/26 — the years the report consistently covers both NCHDs and Consultants (it was NCHD-only before, under a different title, back to 2010). HSE's own site was down when this was pulled; every figure here traces to a specific table/figure in a specific year's PDF, including one real cross-report data revision — see <code>data/raw/hse/SOURCES.md</code> for exact citations.</span>
     </div>
   </header>
 
   <div class="tiles">
     <div class="tile">
-      <p class="tile-label">Consultant workforce growth, 2019–2024</p>
-      <p class="tile-value"><span class="a-primary">+41%</span></p>
-      <p class="tile-sub">3,266 → 4,620</p>
+      <p class="tile-label">Consultant workforce, 2025</p>
+      <p class="tile-value"><span class="a-primary">4,962</span></p>
+      <p class="tile-sub">+52% since 2019 (3,266)</p>
     </div>
     <div class="tile">
-      <p class="tile-label">Vacant consultant posts, Dec 2024</p>
-      <p class="tile-value"><span class="a-secondary">309</span></p>
-      <p class="tile-sub">down from a peak of 445 in 2023</p>
+      <p class="tile-label">Vacant consultant posts, Dec 2025</p>
+      <p class="tile-value"><span class="a-secondary">324</span></p>
+      <p class="tile-sub">+5% on 2024 — the fall reversed</p>
     </div>
     <div class="tile">
-      <p class="tile-label">NTSDs graduated in Pakistan, 2024</p>
-      <p class="tile-value"><span class="a-secondary">33.1%</span></p>
-      <p class="tile-sub">vs. 20.9% graduated in Ireland</p>
+      <p class="tile-label">NTSDs graduated in Pakistan, 2025</p>
+      <p class="tile-value"><span class="a-secondary">34.2%</span></p>
+      <p class="tile-sub">vs. 21.8% graduated in Ireland</p>
     </div>
   </div>
 
@@ -223,82 +232,132 @@
   <section class="group" id="sec-growth">
     <div class="group-head">
       <h2><span class="group-num">01</span> Workforce growth</h2>
-      <p>Consultants, doctors-in-training, and non-training-scheme doctors (NTSDs — hospital doctors not on a formal training programme), 2019–2024.</p>
+      <p>Consultants, doctors-in-training, and non-training-scheme doctors (NTSDs — hospital doctors not on a formal training programme).</p>
     </div>
-    <article class="chart">
-      <div class="chart-head">
-        <div>
-          <h3>Headcount by category</h3>
-          <p>Publicly funded services in Ireland, HSE NDTP annual census</p>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot</p>
+        <div class="chart-head">
+          <div><h3>Current headcount, 2025</h3><p>Publicly funded services in Ireland</p></div>
+          <button class="toggle-table" data-target="table-growth-snap" aria-expanded="false">Table</button>
         </div>
-        <button class="toggle-table" data-target="table-growth" aria-expanded="false">View as table</button>
-      </div>
-      <div class="chart-wrap"><svg id="svg-growth" viewBox="0 0 880 300" role="img" aria-label="Line chart of consultant workforce, training NCHDs, and non-training scheme doctors from 2019 to 2024"></svg></div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Consultants</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Training NCHDs (incl. interns)</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>NTSDs</span>
-      </div>
-      <table class="data-table hidden" id="table-growth"><thead><tr><th>Year</th><th>Consultants</th><th>Training NCHDs</th><th>NTSDs</th></tr></thead><tbody></tbody></table>
-      <p class="foot-note">Consultant workforce for 2022 shown as 3,782 (restated in the 2023-24 and 2024-25 reports) rather than the 3,814 the 2022-23 report originally reported for itself — see SOURCES.md. Source: HSE Medical Workforce Reports 2023-24 (2019 figures) and 2024-25 (2020-2024 figures), both Table 1.</p>
-    </article>
+        <div class="chart-wrap"><svg id="svg-growth-snap" viewBox="0 0 420 300" role="img" aria-label="Bar chart of 2025 headcount for consultants, training NCHDs, and NTSDs"></svg></div>
+        <table class="data-table hidden" id="table-growth-snap"><thead><tr><th>Category</th><th>2025</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Trend, 2019–2025</p>
+        <div class="chart-head">
+          <div><h3>Headcount by category</h3><p>HSE NDTP annual census, each report's own retrospective table</p></div>
+          <button class="toggle-table" data-target="table-growth" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-growth" viewBox="0 0 620 300" role="img" aria-label="Line chart of consultant workforce, training NCHDs, and non-training scheme doctors from 2019 to 2025"></svg></div>
+        <table class="data-table hidden" id="table-growth"><thead><tr><th>Year</th><th>Consultants</th><th>Training NCHDs</th><th>NTSDs</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <div class="legend" style="margin-top:0.9rem">
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Consultants</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Training NCHDs (incl. interns)</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>NTSDs</span>
+    </div>
+    <p class="foot-note">Consultant Workforce for 2021-2025 uses each year's freshest available restatement (from the 2025-26 report), not necessarily what that year's own report first said — 2022 alone has been reported as both 3,814 and 3,782 across different report vintages. See SOURCES.md for the full revision history. Source: HSE Medical Workforce Reports 2023-24 (2019 figure), 2024-25 (2020 figure), 2025-26 (2021-2025 figures), all Table 1.</p>
   </section>
 
   <!-- ============ SECTION 2: VACANT POSTS ============ -->
   <section class="group" id="sec-vacant">
     <div class="group-head">
-      <h2><span class="group-num">02</span> The vacancy spike, and the fall</h2>
+      <h2><span class="group-num">02</span> The vacancy spike, and the fall — and rise again</h2>
       <p>Total vacant approved consultant posts nationally, each year's own year-end snapshot.</p>
     </div>
-    <article class="chart">
-      <div class="chart-head">
-        <div><h3>Vacant consultant posts</h3><p>179 in 2019 → peak of 445 in 2023 → 309 in 2024</p></div>
-        <button class="toggle-table" data-target="table-vacant" aria-expanded="false">View as table</button>
-      </div>
-      <div class="chart-wrap"><svg id="svg-vacant" viewBox="0 0 880 280" role="img" aria-label="Area chart of total vacant consultant posts from 2019 to 2024, rising then falling"></svg></div>
-      <table class="data-table hidden" id="table-vacant"><thead><tr><th>Year</th><th>Vacant posts</th><th>Snapshot date</th></tr></thead><tbody></tbody></table>
-      <p class="foot-note">Measurement date shifts across years (Sept 2019 → Oct 2020 → Oct 2021 → Dec 2022 → Dec 2023 → Dec 2024) — not a same-day comparison, but the trend is HSE's own reported figure each year, not a derived estimate. Source: each year's own report, section 5.1.3 "Vacant Posts" (or equivalent prose in the 2019-20/2020-21 reports, which predate that section).</p>
-    </article>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot</p>
+        <div class="chart-head">
+          <div><h3>How long vacant, Dec 2025</h3><p>324 vacant posts by duration</p></div>
+          <button class="toggle-table" data-target="table-vacant-snap" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-vacant-snap" viewBox="0 0 420 300" role="img" aria-label="Bar chart of vacant consultant posts by duration vacant, December 2025"></svg></div>
+        <table class="data-table hidden" id="table-vacant-snap"><thead><tr><th>Duration</th><th>Posts</th><th>Share</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Trend, 2019–2025</p>
+        <div class="chart-head">
+          <div><h3>Vacant consultant posts</h3><p>179 (2019) → peak 445 (2023) → 309 (2024) → 324 (2025)</p></div>
+          <button class="toggle-table" data-target="table-vacant" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-vacant" viewBox="0 0 620 300" role="img" aria-label="Area chart of total vacant consultant posts from 2019 to 2025, rising then falling then rising slightly"></svg></div>
+        <table class="data-table hidden" id="table-vacant"><thead><tr><th>Year</th><th>Vacant posts</th><th>Snapshot date</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note">Measurement date shifts across years (Sept 2019 → Oct 2020 → Oct 2021 → Dec 2022 → Dec 2023 → Dec 2024 → Dec 2025). 2025's own report frames it plainly: "a function of the number of new posts and the duration it takes to fill these posts." Source: each year's own report, section 5.1.3 "Vacant Posts" (or equivalent prose in the 2019-20/2020-21 reports, which predate that section).</p>
   </section>
 
   <!-- ============ SECTION 3: WHERE NTSDs TRAINED ============ -->
   <section class="group" id="sec-nationality">
     <div class="group-head">
       <h2><span class="group-num">03</span> Where non-training-scheme doctors trained</h2>
-      <p>Country of graduation of NTSDs — only published from 2022 onward. Pakistan overtook Ireland as the single largest source in every year this data exists.</p>
+      <p>Country of graduation of NTSDs — only published from 2022 onward. HSE's own 2025 report states it plainly: 78% of NTSDs graduated outside Ireland, versus 48% of NCHDs overall.</p>
     </div>
-    <article class="chart">
-      <div class="chart-head">
-        <div><h3>Country of graduation</h3><p>Share of NTSDs, by graduation country</p></div>
-        <button class="toggle-table" data-target="table-nationality" aria-expanded="false">View as table</button>
-      </div>
-      <div class="chart-wrap"><svg id="svg-nationality" viewBox="0 0 880 280" role="img" aria-label="Stacked area chart of NTSD country of graduation share from 2022 to 2024"></svg></div>
-      <div class="legend">
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Pakistan</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Ireland</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Sudan</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Other</span>
-      </div>
-      <table class="data-table hidden" id="table-nationality"><thead><tr><th>Year</th><th>Pakistan</th><th>Ireland</th><th>Sudan</th><th>Other</th></tr></thead><tbody></tbody></table>
-      <p class="foot-note">"Other" combines every minor country each report lists separately (Romania, South Africa, Egypt, and — in 2024 only — continent-level buckets for the rest); the exact minor-country splits are in SOURCES.md. This is NTSDs specifically (non-training-scheme hospital doctors) — HSE doesn't publish this breakdown for consultants or training-scheme doctors. Source: HSE Medical Workforce Reports 2022-23 (Fig. 4.20), 2023-24 (Fig. 23), 2024-25 (Fig. 24).</p>
-    </article>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot</p>
+        <div class="chart-head">
+          <div><h3>Every country of graduation, 2025</h3><p>Full breakdown, as HSE published it</p></div>
+          <button class="toggle-table" data-target="table-nat-snap" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-nat-snap" viewBox="0 0 420 300" role="img" aria-label="Horizontal bar chart of every country or region of graduation for NTSDs in 2025"></svg></div>
+        <table class="data-table hidden" id="table-nat-snap"><thead><tr><th>Country / region</th><th>Share</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Trend, 2022–2025</p>
+        <div class="chart-head">
+          <div><h3>Country of graduation over time</h3><p>Share of NTSDs, consolidated to 4 groups</p></div>
+          <button class="toggle-table" data-target="table-nationality" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-nationality" viewBox="0 0 620 300" role="img" aria-label="Stacked area chart of NTSD country of graduation share from 2022 to 2025"></svg></div>
+        <table class="data-table hidden" id="table-nationality"><thead><tr><th>Year</th><th>Pakistan</th><th>Ireland</th><th>Sudan</th><th>Other</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <div class="legend" style="margin-top:0.9rem">
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Pakistan</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Ireland</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Sudan</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>Other / by-region (snapshot only)</span>
+    </div>
+    <p class="foot-note">The trend chart's "Other" combines every minor country each report lists separately — exact splits (Romania, South Africa, Egypt, and continent-level buckets from 2024 on) are in SOURCES.md. This is NTSDs specifically — HSE doesn't publish this breakdown for consultants or training-scheme doctors. Source: HSE Medical Workforce Reports 2022-23 (Fig. 4.20), 2023-24 (Fig. 23), 2024-25 (Fig. 24), 2025-26 (Fig. 30).</p>
   </section>
 
   <!-- ============ SECTION 4: VACANCY BY SPECIALTY ============ -->
   <section class="group" id="sec-specialty">
     <div class="group-head">
       <h2><span class="group-num">04</span> Where the gaps are</h2>
-      <p>Approved consultant posts vacant as of December 2024, by specialty — the 12 specialties with the most vacancies nationally.</p>
+      <p>Approved consultant posts vacant, by specialty.</p>
     </div>
-    <article class="chart">
-      <div class="chart-head">
-        <div><h3>Vacant posts by specialty</h3><p>Top 12 of ~40 specialties tracked, December 2024</p></div>
-        <button class="toggle-table" data-target="table-specialty" aria-expanded="false">View as table</button>
-      </div>
-      <div class="chart-wrap"><svg id="svg-specialty" viewBox="0 0 880 380" role="img" aria-label="Horizontal bar chart of vacant consultant posts by specialty, top 12, December 2024"></svg></div>
-      <table class="data-table hidden" id="table-specialty"><thead><tr><th>Specialty</th><th>Vacant posts</th></tr></thead><tbody></tbody></table>
-      <p class="foot-note">A single snapshot, not a trend — the full ~40-specialty table (and equivalent tables in earlier years, not yet reconciled into a multi-year view) is in Table 15 of the 2024-25 report. Radiology and Psychiatry's high raw counts partly reflect that they're large disciplines nationally, not necessarily the highest vacancy <em>rate</em>. Source: HSE Medical Workforce Report 2024-25, Table 15.</p>
-    </article>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot</p>
+        <div class="chart-head">
+          <div><h3>Top 12 specialties, Dec 2025</h3><p>Of ~40 specialties tracked</p></div>
+          <button class="toggle-table" data-target="table-specialty-snap" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-specialty-snap" viewBox="0 0 420 380" role="img" aria-label="Horizontal bar chart of vacant consultant posts by specialty, top 12, December 2025"></svg></div>
+        <table class="data-table hidden" id="table-specialty-snap"><thead><tr><th>Specialty</th><th>Vacant posts</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Trend, 2022–2025</p>
+        <div class="chart-head">
+          <div><h3>Three specialties, three stories</h3><p>Radiology declining, Psychiatry volatile, Emergency Medicine much improved</p></div>
+          <button class="toggle-table" data-target="table-specialty-trend" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-specialty-trend" viewBox="0 0 620 300" role="img" aria-label="Line chart of vacant posts for Radiology, Psychiatry, and Emergency Medicine from 2022 to 2025"></svg></div>
+        <table class="data-table hidden" id="table-specialty-trend"><thead><tr><th>Year</th><th>Radiology</th><th>Psychiatry</th><th>Emergency Medicine</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <div class="legend" style="margin-top:0.9rem">
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Radiology</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Psychiatry</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Emergency Medicine</span>
+    </div>
+    <p class="foot-note">A snapshot for the top 12; a hand-picked trend for 3 specialties, not all ~40 (see SOURCES.md for why a full multi-year specialty grid wasn't built). "Psychiatry" was labeled "General Adult Psychiatry" in the 2023 report only — same underlying specialty. Radiology and Psychiatry's high raw counts partly reflect that they're large disciplines nationally, not necessarily the highest vacancy <em>rate</em>. Source: HSE Medical Workforce Reports 2022-23 (Table 5.5), 2023-24 (Table 15), 2024-25 (Table 15), 2025-26 (Table 14).</p>
   </section>
 
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
@@ -341,6 +400,116 @@
     tooltip.style.top = (y * scale) + 'px';
   }
 
+  // ================= Generic vertical bar (single series) =================
+  function renderVerticalBar(svgId, data, colors, tableSelector, opts) {
+    opts = opts || {};
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = opts.padL || 56, padR = 16, padT = 20, padB = 56;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var rawMax = Math.max.apply(null, data.map(function (d) { return d.value; })) * 1.15;
+    var niceStep = opts.niceStep || (rawMax > 1000 ? 1000 : 50);
+    var maxVal = Math.ceil(rawMax / niceStep) * niceStep;
+    var barGap = 20, barW = (plotW - barGap * (data.length - 1)) / data.length;
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var v = maxVal * f, y = padT + plotH - f * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 8, y: y + 4, 'text-anchor': 'end' });
+      t.textContent = opts.pctMode ? Math.round(v) + '%' : fmt(Math.round(v)); svg.appendChild(t);
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var color = Array.isArray(colors) ? colors[i] : colors;
+      var x = padL + i * (barW + barGap), barH = (d.value / maxVal) * plotH, y = padT + plotH - barH, r = 4;
+      var path = el('path', {
+        d: 'M' + x + ',' + (y + r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+           ' L' + (x + barW - r) + ',' + y + ' Q' + (x + barW) + ',' + y + ' ' + (x + barW) + ',' + (y + r) +
+           ' L' + (x + barW) + ',' + (padT + plotH) + ' L' + x + ',' + (padT + plotH) + ' Z',
+        fill: color
+      });
+      svg.appendChild(path);
+      var hit = el('rect', { x: x, y: padT, width: barW, height: plotH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+      var vl = el('text', { class: 'bar-value', x: x + barW / 2, y: y - 10, 'text-anchor': 'middle' });
+      vl.textContent = opts.pctMode ? pct(d.value) : fmt(d.value); svg.appendChild(vl);
+
+      // wrap long labels onto 2 lines by splitting on the last space before ~14 chars
+      var label = d.label;
+      var words = label.split(' ');
+      var lines = words.length > 1 && label.length > 14 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [label];
+      lines.forEach(function (line, li) {
+        var nl = el('text', { class: 'bar-label', x: x + barW / 2, y: padT + plotH + 20 + li * 14, 'text-anchor': 'middle' });
+        nl.textContent = line; svg.appendChild(nl);
+      });
+
+      hit.addEventListener('mouseenter', function () {
+        path.setAttribute('opacity', '0.8');
+        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>' + (opts.pctMode ? pct(d.value) : fmt(d.value)) + '</strong>' + (opts.unit || '');
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, x + barW / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>' + (opts.pctMode ? pct(d.value) : fmt(d.value)) + '</td>' + (d.extra ? '<td>' + d.extra + '</td>' : '');
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ================= Generic horizontal bar =================
+  function renderHorizontalBar(svgId, data, colors, tableSelector, opts) {
+    opts = opts || {};
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = opts.padL || 190, padR = 44, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxVal = opts.maxVal || Math.ceil(Math.max.apply(null, data.map(function (d) { return d.value; })) * 1.15);
+    var barGap = 6, barH = (plotH - barGap * (data.length - 1)) / data.length;
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var color = Array.isArray(colors) ? colors[i] : colors;
+      var y = padT + i * (barH + barGap);
+      var w = (d.value / maxVal) * plotW;
+      var r = 3;
+      var path = el('path', {
+        d: 'M' + padL + ',' + y + ' L' + (padL + w - r) + ',' + y +
+           ' Q' + (padL + w) + ',' + y + ' ' + (padL + w) + ',' + (y + r) +
+           ' L' + (padL + w) + ',' + (y + barH - r) + ' Q' + (padL + w) + ',' + (y + barH) + ' ' + (padL + w - r) + ',' + (y + barH) +
+           ' L' + padL + ',' + (y + barH) + ' Z',
+        fill: color
+      });
+      svg.appendChild(path);
+      var hit = el('rect', { x: padL, y: y, width: plotW, height: barH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+
+      var lbl = el('text', { class: 'bar-label', x: padL - 10, y: y + barH / 2 + 4, 'text-anchor': 'end' });
+      lbl.textContent = d.label; svg.appendChild(lbl);
+      var val = el('text', { class: 'bar-value', x: padL + w + 8, y: y + barH / 2 + 4, 'text-anchor': 'start' });
+      val.textContent = opts.pctMode ? pct(d.value) : d.value; svg.appendChild(val);
+
+      hit.addEventListener('mouseenter', function () {
+        path.setAttribute('opacity', '0.8');
+        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>' + (opts.pctMode ? pct(d.value) : fmt(d.value)) + '</strong>' + (opts.unit || '');
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, padL + w / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>' + (opts.pctMode ? pct(d.value) : fmt(d.value)) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
   // ================= Generic multi-line chart =================
   function renderLines(svgId, data, seriesKeys, colors, tableSelector) {
     var svg = document.getElementById(svgId);
@@ -348,8 +517,9 @@
     var padL = 54, padR = 16, padT = 20, padB = 34;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var allVals = data.flatMap(function (d) { return seriesKeys.map(function (k) { return d[k]; }); });
-    var maxVal = Math.ceil(Math.max.apply(null, allVals) * 1.08 / 500) * 500;
-    var minVal = 0;
+    var rawMax = Math.max.apply(null, allVals) * 1.08;
+    var niceStep = rawMax > 1000 ? 500 : (rawMax > 100 ? 10 : 5);
+    var maxVal = Math.ceil(rawMax / niceStep) * niceStep;
 
     [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
       var v = maxVal * f;
@@ -410,51 +580,36 @@
     });
   }
 
-  var growth = [
-    { label: '2019', Consultants: 3266, 'Training NCHDs (incl. interns)': 4155, NTSDs: 2788 },
-    { label: '2020', Consultants: 3448, 'Training NCHDs (incl. interns)': 4674, NTSDs: 2756 },
-    { label: '2021', Consultants: 3563, 'Training NCHDs (incl. interns)': 4854, NTSDs: 2801 },
-    { label: '2022', Consultants: 3782, 'Training NCHDs (incl. interns)': 4988, NTSDs: 2920 },
-    { label: '2023', Consultants: 4255, 'Training NCHDs (incl. interns)': 5198, NTSDs: 3549 },
-    { label: '2024', Consultants: 4620, 'Training NCHDs (incl. interns)': 5412, NTSDs: 3950 }
-  ];
-  renderLines('svg-growth', growth, ['Consultants', 'Training NCHDs (incl. interns)', 'NTSDs'],
-    [cssVar('--primary'), cssVar('--tertiary'), cssVar('--secondary')], '#table-growth');
-
-  // ================= Vacant posts: single-series area =================
-  var vacant = [
-    { label: '2019', value: 179, date: 'Sept 2019' },
-    { label: '2020', value: 221, date: '9 Oct 2020' },
-    { label: '2021', value: 360, date: 'Oct 2021' },
-    { label: '2022', value: 444, date: 'Dec 2022' },
-    { label: '2023', value: 445, date: 'Dec 2023' },
-    { label: '2024', value: 309, date: 'Dec 2024' }
-  ];
-  (function renderVacant() {
-    var svg = document.getElementById('svg-vacant');
-    var W = 880, H = 280, padL = 50, padR = 16, padT = 20, padB = 34;
+  // ================= Generic single-series area (with date labels) =================
+  function renderArea(svgId, data, color, colorFill, tableSelector, opts) {
+    opts = opts || {};
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = 50, padR = 16, padT = 20, padB = 34;
     var plotW = W - padL - padR, plotH = H - padT - padB;
-    var maxVal = 500, secondary = cssVar('--secondary'), secondaryFill = cssVar('--secondary-fill');
+    var rawMax = Math.max.apply(null, data.map(function (d) { return d.value; })) * 1.15;
+    var niceStep = rawMax > 1000 ? 500 : 100;
+    var maxVal = Math.ceil(rawMax / niceStep) * niceStep;
 
-    [0, 125, 250, 375, 500].forEach(function (v) {
-      var y = padT + plotH - (v / maxVal) * plotH;
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var v = maxVal * f, y = padT + plotH - f * plotH;
       svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
-      var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' }); t.textContent = fmt(v); svg.appendChild(t);
+      var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' }); t.textContent = fmt(Math.round(v)); svg.appendChild(t);
     });
 
-    function xPos(i) { return padL + (i / (vacant.length - 1)) * plotW; }
+    function xPos(i) { return padL + (i / (data.length - 1)) * plotW; }
     function yPos(v) { return padT + plotH - (v / maxVal) * plotH; }
 
-    vacant.forEach(function (d, i) {
+    data.forEach(function (d, i) {
       var t = el('text', { class: 'axis', x: xPos(i), y: padT + plotH + 22, 'text-anchor': 'middle' });
       t.textContent = d.label; svg.appendChild(t);
     });
 
-    var linePts = vacant.map(function (d, i) { return xPos(i) + ',' + yPos(d.value); }).join(' ');
-    var areaPath = 'M' + xPos(0) + ',' + (padT + plotH) + ' L' + linePts.split(' ').join(' L') + ' L' + xPos(vacant.length - 1) + ',' + (padT + plotH) + ' Z';
-    svg.appendChild(el('path', { d: areaPath, fill: secondaryFill }));
-    svg.appendChild(el('polyline', { points: linePts, fill: 'none', stroke: secondary, 'stroke-width': '2.5', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
-    vacant.forEach(function (d, i) { svg.appendChild(el('circle', { cx: xPos(i), cy: yPos(d.value), r: 4, fill: secondary })); });
+    var linePts = data.map(function (d, i) { return xPos(i) + ',' + yPos(d.value); }).join(' ');
+    var areaPath = 'M' + xPos(0) + ',' + (padT + plotH) + ' L' + linePts.split(' ').join(' L') + ' L' + xPos(data.length - 1) + ',' + (padT + plotH) + ' Z';
+    svg.appendChild(el('path', { d: areaPath, fill: colorFill }));
+    svg.appendChild(el('polyline', { points: linePts, fill: 'none', stroke: color, 'stroke-width': '2.5', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    data.forEach(function (d, i) { svg.appendChild(el('circle', { cx: xPos(i), cy: yPos(d.value), r: 4, fill: color })); });
 
     var crosshair = el('line', { class: 'crosshair-line', x1: 0, x2: 0, y1: padT, y2: padT + plotH });
     svg.appendChild(crosshair);
@@ -466,34 +621,30 @@
       var rect = svg.getBoundingClientRect();
       var scale = W / rect.width;
       var mx = (ev.clientX - rect.left) * scale;
-      var idx = Math.round(((mx - padL) / plotW) * (vacant.length - 1));
-      idx = Math.max(0, Math.min(vacant.length - 1, idx));
+      var idx = Math.round(((mx - padL) / plotW) * (data.length - 1));
+      idx = Math.max(0, Math.min(data.length - 1, idx));
       var px = xPos(idx);
       crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = '1';
-      tooltip.innerHTML = '<span class="tt-label">' + vacant[idx].label + ' (' + vacant[idx].date + ')</span><br><strong>' + fmt(vacant[idx].value) + '</strong> vacant posts';
+      tooltip.innerHTML = '<span class="tt-label">' + data[idx].label + (opts.dateKey ? ' (' + data[idx][opts.dateKey] + ')' : '') + '</span><br><strong>' + fmt(data[idx].value) + '</strong>' + (opts.unit || '');
       tooltip.style.opacity = '1';
-      positionTooltip(tooltip, svg, W, px, yPos(vacant[idx].value));
+      positionTooltip(tooltip, svg, W, px, yPos(data[idx].value));
     });
     overlay.addEventListener('mouseleave', function () { crosshair.style.opacity = '0'; tooltip.style.opacity = '0'; });
 
-    var tbody = document.querySelector('#table-vacant tbody');
-    vacant.forEach(function (d) {
-      var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td><td>' + fmt(d.value) + '</td><td>' + d.date + '</td>'; tbody.appendChild(tr);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+    data.forEach(function (d) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>' + fmt(d.value) + '</td>' + (opts.dateKey ? '<td>' + d[opts.dateKey] + '</td>' : '');
+      tbody.appendChild(tr);
     });
-  })();
+  }
 
-  // ================= Nationality: stacked % area =================
-  var nationality = [
-    { label: '2022', Pakistan: 26, Ireland: 23, Sudan: 18, Other: 34 },
-    { label: '2023', Pakistan: 30, Ireland: 20, Sudan: 18, Other: 33 },
-    { label: '2024', Pakistan: 33.1, Ireland: 20.9, Sudan: 16.8, Other: 29.1 }
-  ];
-  (function renderNationality() {
-    var svg = document.getElementById('svg-nationality');
-    var W = 880, H = 280, padL = 50, padR = 16, padT = 20, padB = 34;
+  // ================= Generic stacked % area =================
+  function renderStackedArea(svgId, data, seriesKeys, colors, tableSelector) {
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = 50, padR = 16, padT = 20, padB = 34;
     var plotW = W - padL - padR, plotH = H - padT - padB, maxTotal = 100;
-    var seriesKeys = ['Pakistan', 'Ireland', 'Sudan', 'Other'];
-    var colors = [cssVar('--secondary'), cssVar('--primary'), cssVar('--tertiary'), cssVar('--neutral-series')];
 
     [0, 25, 50, 75, 100].forEach(function (v) {
       var y = padT + plotH - (v / maxTotal) * plotH;
@@ -501,11 +652,11 @@
       var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' }); t.textContent = v + '%'; svg.appendChild(t);
     });
 
-    function xPos(i) { return padL + (i / (nationality.length - 1)) * plotW; }
+    function xPos(i) { return padL + (i / (data.length - 1)) * plotW; }
 
-    var cum = nationality.map(function () { return 0; });
+    var cum = data.map(function () { return 0; });
     var layers = seriesKeys.map(function (key) {
-      var points = nationality.map(function (d, i) {
+      var points = data.map(function (d, i) {
         var base = cum[i], top = base + d[key]; cum[i] = top;
         return { base: base, top: top };
       });
@@ -517,13 +668,13 @@
 
     layers.forEach(function (layer, li) {
       var topPts = layer.points.map(function (p, i) { return xPos(i) + ',' + (padT + plotH - (p.top / maxTotal) * plotH); }).join(' ');
-      var botPts = layer.points.map(function (p, i) { return xPos(nationality.length - 1 - i) + ',' + (padT + plotH - (layer.points[nationality.length - 1 - i].base / maxTotal) * plotH); }).join(' ');
+      var botPts = layer.points.map(function (p, i) { return xPos(data.length - 1 - i) + ',' + (padT + plotH - (layer.points[data.length - 1 - i].base / maxTotal) * plotH); }).join(' ');
       var areaPath = 'M' + topPts.split(' ').join(' L') + ' L' + botPts.split(' ').join(' L') + ' Z';
       svg.appendChild(el('path', { d: areaPath, fill: colors[li], opacity: '0.88' }));
       svg.appendChild(el('polyline', { points: topPts, fill: 'none', stroke: colors[li], 'stroke-width': '1.5', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
     });
 
-    nationality.forEach(function (d, i) {
+    data.forEach(function (d, i) {
       var t = el('text', { class: 'axis', x: xPos(i), y: padT + plotH + 22, 'text-anchor': 'middle' });
       t.textContent = d.label; svg.appendChild(t);
     });
@@ -536,79 +687,127 @@
       var rect = svg.getBoundingClientRect();
       var scale = W / rect.width;
       var mx = (ev.clientX - rect.left) * scale;
-      var idx = Math.round(((mx - padL) / plotW) * (nationality.length - 1));
-      idx = Math.max(0, Math.min(nationality.length - 1, idx));
+      var idx = Math.round(((mx - padL) / plotW) * (data.length - 1));
+      idx = Math.max(0, Math.min(data.length - 1, idx));
       var px = xPos(idx);
       crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = '1';
       var rows = seriesKeys.map(function (key, si) {
-        return '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + key + '</span> <strong>' + pct(nationality[idx][key]) + '</strong></div>';
+        return '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + key + '</span> <strong>' + pct(data[idx][key]) + '</strong></div>';
       }).join('');
-      tooltip.innerHTML = '<div style="margin-bottom:4px;font-weight:600">' + nationality[idx].label + '</div>' + rows;
+      tooltip.innerHTML = '<div style="margin-bottom:4px;font-weight:600">' + data[idx].label + '</div>' + rows;
       tooltip.style.opacity = '1';
       positionTooltip(tooltip, svg, W, px, padT + plotH * 0.25);
     });
     overlay.addEventListener('mouseleave', function () { crosshair.style.opacity = '0'; tooltip.style.opacity = '0'; });
 
-    var tbody = document.querySelector('#table-nationality tbody');
-    nationality.forEach(function (d) {
+    var tbody = document.querySelector(tableSelector + ' tbody');
+    data.forEach(function (d) {
       var cells = seriesKeys.map(function (k) { return '<td>' + pct(d[k]) + '</td>'; }).join('');
       var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td>' + cells; tbody.appendChild(tr);
     });
-  })();
+  }
 
-  // ================= Specialty vacancy: horizontal bar =================
-  var specialty = [
-    { label: 'Radiology', value: 36 }, { label: 'Paediatrics', value: 25 }, { label: 'Psychiatry', value: 25 },
-    { label: 'Anaesthesiology', value: 22 }, { label: 'Geriatric Medicine', value: 18 }, { label: 'Emergency Medicine', value: 16 },
-    { label: 'Microbiology', value: 15 }, { label: 'Obstetrics & Gynaecology', value: 14 }, { label: 'General Surgery', value: 13 },
-    { label: 'Child & Adolescent Psychiatry', value: 12 }, { label: 'Histopathology', value: 10 }, { label: 'Dermatology', value: 9 }
+  // ============================================================
+  // SECTION 1 DATA
+  // ============================================================
+  var growthSnap2025 = [
+    { label: 'Consultants', value: 4962 },
+    { label: 'Training NCHDs', value: 5791 },
+    { label: 'NTSDs', value: 4018 }
   ];
-  (function renderSpecialty() {
-    var svg = document.getElementById('svg-specialty');
-    var W = 880, H = 380, padL = 190, padR = 40, padT = 10, padB = 10;
-    var plotW = W - padL - padR, plotH = H - padT - padB;
-    var maxVal = 40, barGap = 6, barH = (plotH - barGap * (specialty.length - 1)) / specialty.length;
-    var secondary = cssVar('--secondary');
+  renderVerticalBar('svg-growth-snap', growthSnap2025,
+    [cssVar('--primary'), cssVar('--tertiary'), cssVar('--secondary')], '#table-growth-snap', { niceStep: 1000 });
 
-    [0, 10, 20, 30, 40].forEach(function (v) {
-      var x = padL + (v / maxVal) * plotW;
-      svg.appendChild(el('line', { class: 'gridline', x1: x, x2: x, y1: padT, y2: padT + plotH }));
+  var growth = [
+    { label: '2019', Consultants: 3266, 'Training NCHDs': 4155, NTSDs: 2788 },
+    { label: '2020', Consultants: 3448, 'Training NCHDs': 4674, NTSDs: 2756 },
+    { label: '2021', Consultants: 3563, 'Training NCHDs': 4854, NTSDs: 2801 },
+    { label: '2022', Consultants: 3814, 'Training NCHDs': 4988, NTSDs: 2920 },
+    { label: '2023', Consultants: 4289, 'Training NCHDs': 5198, NTSDs: 3549 },
+    { label: '2024', Consultants: 4698, 'Training NCHDs': 5412, NTSDs: 3950 },
+    { label: '2025', Consultants: 4962, 'Training NCHDs': 5791, NTSDs: 4018 }
+  ];
+  renderLines('svg-growth', growth, ['Consultants', 'Training NCHDs', 'NTSDs'],
+    [cssVar('--primary'), cssVar('--tertiary'), cssVar('--secondary')], '#table-growth');
+
+  // ============================================================
+  // SECTION 2 DATA
+  // ============================================================
+  var vacantSnap2025 = [
+    { label: '< 6 Months', value: 56 },
+    { label: '6-12 Months', value: 11 },
+    { label: '12-18 Months', value: 9 },
+    { label: '18+ Months', value: 24 }
+  ];
+  renderVerticalBar('svg-vacant-snap', vacantSnap2025, cssVar('--secondary'), '#table-vacant-snap',
+    { pctMode: true, niceStep: 25 });
+  // fix table to show raw counts alongside %, since renderVerticalBar's table only has 2 cols
+  (function fixVacantSnapTable() {
+    var raw = { '< 6 Months': 182, '6-12 Months': 37, '12-18 Months': 28, '18+ Months': 77 };
+    document.querySelectorAll('#table-vacant-snap tbody tr').forEach(function (tr) {
+      var label = tr.children[0].textContent;
+      var td = document.createElement('td');
+      td.textContent = fmt(raw[label]) + ' posts';
+      tr.appendChild(td);
     });
-
-    var container = svg.closest('article').querySelector('.chart-wrap');
-    var tooltip = makeTooltip(container);
-    var tbody = document.querySelector('#table-specialty tbody');
-
-    specialty.forEach(function (d, i) {
-      var y = padT + i * (barH + barGap);
-      var w = (d.value / maxVal) * plotW;
-      var r = 3;
-      var path = el('path', {
-        d: 'M' + padL + ',' + y + ' L' + (padL + w - r) + ',' + y +
-           ' Q' + (padL + w) + ',' + y + ' ' + (padL + w) + ',' + (y + r) +
-           ' L' + (padL + w) + ',' + (y + barH - r) + ' Q' + (padL + w) + ',' + (y + barH) + ' ' + (padL + w - r) + ',' + (y + barH) +
-           ' L' + padL + ',' + (y + barH) + ' Z',
-        fill: secondary
-      });
-      svg.appendChild(path);
-      var hit = el('rect', { x: padL, y: y, width: plotW, height: barH, fill: 'transparent', class: 'hover-target' });
-      svg.appendChild(hit);
-
-      var lbl = el('text', { class: 'bar-label', x: padL - 10, y: y + barH / 2 + 4, 'text-anchor': 'end' });
-      lbl.textContent = d.label; svg.appendChild(lbl);
-      var val = el('text', { class: 'bar-value', x: padL + w + 8, y: y + barH / 2 + 4, 'text-anchor': 'start' });
-      val.textContent = d.value; svg.appendChild(val);
-
-      hit.addEventListener('mouseenter', function (ev) {
-        path.setAttribute('opacity', '0.8');
-        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>' + d.value + '</strong> vacant posts';
-        tooltip.style.opacity = '1';
-        positionTooltip(tooltip, svg, W, padL + w / 2, y);
-      });
-      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
-
-      var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td><td>' + d.value + '</td>'; tbody.appendChild(tr);
-    });
+    var thead = document.querySelector('#table-vacant-snap thead tr');
+    var th = document.createElement('th'); th.textContent = 'Posts'; thead.appendChild(th);
   })();
+
+  var vacant = [
+    { label: '2019', value: 179, date: 'Sept 2019' },
+    { label: '2020', value: 221, date: '9 Oct 2020' },
+    { label: '2021', value: 360, date: 'Oct 2021' },
+    { label: '2022', value: 444, date: 'Dec 2022' },
+    { label: '2023', value: 445, date: 'Dec 2023' },
+    { label: '2024', value: 309, date: 'Dec 2024' },
+    { label: '2025', value: 324, date: 'Dec 2025' }
+  ];
+  renderArea('svg-vacant', vacant, cssVar('--secondary'), cssVar('--secondary-fill'), '#table-vacant',
+    { dateKey: 'date', unit: ' vacant posts' });
+
+  // ============================================================
+  // SECTION 3 DATA
+  // ============================================================
+  var natSnap2025 = [
+    { label: 'Pakistan', value: 34.2 }, { label: 'Ireland', value: 21.8 }, { label: 'Sudan', value: 16.0 },
+    { label: 'Europe (Excl. Ireland)', value: 12.2 }, { label: 'Africa', value: 7.9 }, { label: 'Asia', value: 7.5 },
+    { label: 'North America', value: 0.2 }, { label: 'South America', value: 0.1 }, { label: 'Australasia', value: 0.1 }
+  ];
+  renderHorizontalBar('svg-nat-snap', natSnap2025,
+    [cssVar('--secondary'), cssVar('--primary'), cssVar('--tertiary'),
+     cssVar('--neutral-series'), cssVar('--neutral-series'), cssVar('--neutral-series'),
+     cssVar('--neutral-series'), cssVar('--neutral-series'), cssVar('--neutral-series')],
+    '#table-nat-snap', { pctMode: true, maxVal: 40 });
+
+  var nationality = [
+    { label: '2022', Pakistan: 26, Ireland: 23, Sudan: 18, Other: 34 },
+    { label: '2023', Pakistan: 30, Ireland: 20, Sudan: 18, Other: 33 },
+    { label: '2024', Pakistan: 33.1, Ireland: 20.9, Sudan: 16.8, Other: 29.1 },
+    { label: '2025', Pakistan: 34.2, Ireland: 21.8, Sudan: 16.0, Other: 28.0 }
+  ];
+  renderStackedArea('svg-nationality', nationality, ['Pakistan', 'Ireland', 'Sudan', 'Other'],
+    [cssVar('--secondary'), cssVar('--primary'), cssVar('--tertiary'), cssVar('--neutral-series')], '#table-nationality');
+
+  // ============================================================
+  // SECTION 4 DATA
+  // ============================================================
+  var specialtySnap2025 = [
+    { label: 'Psychiatry', value: 34 }, { label: 'Radiology', value: 30 }, { label: 'Paediatrics', value: 23 },
+    { label: 'Anaesthesiology', value: 20 }, { label: 'General Surgery', value: 19 }, { label: 'Geriatric Medicine', value: 19 },
+    { label: 'Emergency Medicine', value: 15 }, { label: 'Child & Adolescent Psychiatry', value: 15 },
+    { label: 'Histopathology', value: 12 }, { label: 'Neurology', value: 11 }, { label: 'Microbiology', value: 10 },
+    { label: 'Obstetrics & Gynaecology', value: 9 }
+  ];
+  renderHorizontalBar('svg-specialty-snap', specialtySnap2025, cssVar('--secondary'), '#table-specialty-snap');
+
+  var specialtyTrend = [
+    { label: '2022', Radiology: 41, Psychiatry: 40, 'Emergency Medicine': 50 },
+    { label: '2023', Radiology: 43, Psychiatry: 31, 'Emergency Medicine': 36 },
+    { label: '2024', Radiology: 36, Psychiatry: 25, 'Emergency Medicine': 16 },
+    { label: '2025', Radiology: 30, Psychiatry: 34, 'Emergency Medicine': 15 }
+  ];
+  renderLines('svg-specialty-trend', specialtyTrend, ['Radiology', 'Psychiatry', 'Emergency Medicine'],
+    [cssVar('--primary'), cssVar('--secondary'), cssVar('--tertiary')], '#table-specialty-trend');
 })();
 </script>
