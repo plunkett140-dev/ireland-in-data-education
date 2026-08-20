@@ -427,6 +427,61 @@
     <p class="foot-note"><strong>Two different caveats here, not one:</strong> the sector chart (left) is "public sector," not literally "HSE" — CSO doesn't publish employer-level data, but for a Medicine graduate in Ireland, public sector overwhelmingly means the HSE hospital system. The occupation chart (right) is a single Census 2022 snapshot, not a trajectory — each cohort is measured at a different number of years post-graduation (2010 cohort ≈ 12 years out, 2021 cohort ≈ 1 year out), and it only covers graduates who responded to Census 2022 and were matched — a much smaller group than the full graduating cohort (e.g. 147–537 people per cohort here, versus 500-700+ actual graduates). It answers "of those we can see, are they still doctors?" (consistently yes, 92–98%), not "of everyone who graduated, what fraction still practise?" Source: CSO HGO14 and HGO16, downloaded 2026-08-19.</p>
   </section>
 
+  <!-- ============ SECTION 6: UNDERGRADUATE MEDICINE INTAKE ============ -->
+  <section class="group" id="sec-uem">
+    <div class="group-head">
+      <h2><span class="group-num">06</span> Undergraduate medicine intake</h2>
+      <p>New entrants to direct-entry undergraduate medicine (UEM) alongside Graduate Entry Medicine (GEM), by university and nationality — from an official Dáil written answer, 27 March 2025. TCD and University of Galway offer UEM only (no GEM); UL offers GEM only (no UEM).</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>New entrants by university, 2023/24</h3><p>UEM vs GEM, both nationalities combined</p></div>
+          <button class="toggle-table" data-target="table-uem-uni" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-uem-uni" viewBox="0 0 420 280" role="img" aria-label="Grouped bar chart of new medicine entrants by university and programme type for 2023/24"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>UEM (direct entry)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>GEM (graduate entry)</span>
+        </div>
+        <table class="data-table hidden" id="table-uem-uni"><thead><tr><th>University</th><th>UEM</th><th>GEM</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="chart">
+        <div class="chart-head">
+          <div><h3>Irish/EU vs. international intake</h3><p>National totals, UEM + GEM combined</p></div>
+          <button class="toggle-table" data-target="table-uem-nat" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-uem-nat" viewBox="0 0 420 280" role="img" aria-label="Grouped bar chart of Irish and EU versus international new medicine entrants nationally from 2021/22 to 2023/24"></svg></div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Irish/EU</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>Non-EU (full fee)</span>
+        </div>
+        <table class="data-table hidden" id="table-uem-nat"><thead><tr><th>Year</th><th>Irish/EU</th><th>Non-EU</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <p class="foot-note">RCSI's undergraduate intake is unusual among the six schools — majority non-EU/international every year shown (107 of 189 total UEM entrants in 2023/24), unlike the other five, where Irish/EU students are the majority. Nationally, Irish/EU intake has been rising (767→903) as non-EU intake has fallen (672→523) — plausibly the +200 EU-place expansion agreed between the Department and the medical schools in July 2022 (phased 2022–2026) taking effect, though this data can't confirm that causally on its own. Fee side: Irish/EU UEM students pay no tuition (Free Fees Initiative) plus a €2,500 Student Contribution charge (2025/26); non-EU UEM students pay full fees, roughly €55,000–€61,000/year depending on institution. Source: Dáil written answer, Minister for Further and Higher Education, Research, Innovation and Science, 27 March 2025 (PQ 42), attached data file "Medicine Student Data".</p>
+  </section>
+
+  <!-- ============ SECTION 7: GOVERNMENT FUNDING PER STUDENT ============ -->
+  <section class="group" id="sec-funding">
+    <div class="group-head">
+      <h2><span class="group-num">07</span> What the government pays</h2>
+      <p>State contribution per medicine student, per year — from the Minister's own written Dáil answers, not a single official "cost per student" figure (the Minister said outright in 2021 that none exists).</p>
+    </div>
+    <article class="chart full">
+      <div class="chart-head">
+        <div>
+          <h3>State funding streams, per student per year</h3>
+          <p>Undergraduate is three separate named streams; GEM is one</p>
+        </div>
+        <button class="toggle-table" data-target="table-funding" aria-expanded="false">View as table</button>
+      </div>
+      <div class="chart-wrap"><svg id="svg-funding" viewBox="0 0 880 280" role="img" aria-label="Horizontal bar chart comparing four separate government funding streams per medicine student per year"></svg></div>
+      <table class="data-table hidden" id="table-funding"><thead><tr><th>Funding stream</th><th>Per student, per year</th></tr></thead><tbody></tbody></table>
+      <p class="foot-note"><strong>These four bars are deliberately not summed into a single "total."</strong> The Minister's own 2021 answer names RGAM, the Fottrell top-up, and the Free Fees payment as three distinct funding lines for the same undergraduate place, but doesn't state outright whether a given student's place draws all three simultaneously or whether Fottrell-designated places are funded through that route <em>instead of</em> the standard RGAM rate. Adding all three gives ≈€18,680 — plausible, but not confirmed by the source, so it isn't asserted here. GEM's €14,500 is a single, clean, twice-confirmed figure (phased up from €11,950 in 2021/22 via Budget 2023 and Budget 2024, reaching €14,500 for all places by 2026) — the two funding models aren't structured the same way, so they don't reduce to one comparable number. Source: Dáil written answers, Minister for Further and Higher Education, Research, Innovation and Science — 9 Nov 2021 (PQ 510, RGAM/Fottrell/Free Fees figures), 19 Oct 2023 (PQ 104) and 11 Sep 2023 (PQ 2047) (GEM phasing to €14,500).</p>
+    </article>
+  </section>
+
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
 </div>
 
@@ -820,5 +875,90 @@
       var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td><td>' + pct(d.pct) + '</td>'; tbody.appendChild(tr);
     });
   })();
+
+  // ================= Generic horizontal bar (independent categories, not stacked) =================
+  function renderHorizontalBar(svgId, data, colors, tableSelector, opts) {
+    opts = opts || {};
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = opts.padL || 190, padR = 60, padT = 10, padB = 10;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var maxVal = opts.maxVal || Math.ceil(Math.max.apply(null, data.map(function (d) { return d.value; })) * 1.15);
+    var barGap = 14, barH = (plotH - barGap * (data.length - 1)) / data.length;
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var x = padL + f * plotW;
+      svg.appendChild(el('line', { class: 'gridline', x1: x, x2: x, y1: padT, y2: padT + plotH }));
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var color = Array.isArray(colors) ? colors[i] : colors;
+      var y = padT + i * (barH + barGap);
+      var w = (d.value / maxVal) * plotW;
+      var r = 4;
+      var path = el('path', {
+        d: 'M' + padL + ',' + y + ' L' + (padL + w - r) + ',' + y +
+           ' Q' + (padL + w) + ',' + y + ' ' + (padL + w) + ',' + (y + r) +
+           ' L' + (padL + w) + ',' + (y + barH - r) + ' Q' + (padL + w) + ',' + (y + barH) + ' ' + (padL + w - r) + ',' + (y + barH) +
+           ' L' + padL + ',' + (y + barH) + ' Z',
+        fill: color
+      });
+      svg.appendChild(path);
+      var hit = el('rect', { x: padL, y: y, width: plotW, height: barH, fill: 'transparent', class: 'hover-target' });
+      svg.appendChild(hit);
+
+      var lbl = el('text', { class: 'bar-label', x: padL - 10, y: y + barH / 2 + 4, 'text-anchor': 'end' });
+      lbl.textContent = d.label; svg.appendChild(lbl);
+      var val = el('text', { class: 'bar-value', x: padL + w + 10, y: y + barH / 2 + 4, 'text-anchor': 'start' });
+      val.textContent = euro(d.value); svg.appendChild(val);
+
+      hit.addEventListener('mouseenter', function () {
+        path.setAttribute('opacity', '0.8');
+        tooltip.innerHTML = '<span class="tt-label">' + d.label + '</span><br><strong>' + euro(d.value) + '</strong> / year' + (d.note ? '<br><span class="tt-label">' + d.note + '</span>' : '');
+        tooltip.style.opacity = '1';
+        positionTooltip(tooltip, svg, W, padL + w / 2, y);
+      });
+      hit.addEventListener('mouseleave', function () { path.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.label + '</td><td>' + euro(d.value) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ============================================================
+  // SECTION 6 DATA — new medicine entrants (Dail PQ 42, 27 Mar 2025)
+  // ============================================================
+  var uemByUni = [
+    { label: 'Galway', UEM: 274, GEM: 0 },
+    { label: 'TCD', UEM: 210, GEM: 0 },
+    { label: 'RCSI', UEM: 189, GEM: 88 },
+    { label: 'UCD', UEM: 159, GEM: 104 },
+    { label: 'UCC', UEM: 145, GEM: 77 },
+    { label: 'UL', UEM: 0, GEM: 180 }
+  ];
+  renderGroupedBar('svg-uem-uni', uemByUni, ['UEM', 'GEM'], [cssVar('--primary'), cssVar('--secondary')], '#table-uem-uni', ' new entrants');
+
+  var uemNationality = [
+    { label: '2021/22', 'Irish/EU': 767, 'Non-EU': 672 },
+    { label: '2022/23', 'Irish/EU': 809, 'Non-EU': 576 },
+    { label: '2023/24', 'Irish/EU': 903, 'Non-EU': 523 }
+  ];
+  renderGroupedBar('svg-uem-nat', uemNationality, ['Irish/EU', 'Non-EU'], [cssVar('--primary'), cssVar('--secondary')], '#table-uem-nat', ' new entrants');
+
+  // ============================================================
+  // SECTION 7 DATA — state funding per student (Dail written answers)
+  // ============================================================
+  var funding = [
+    { label: 'UEM — RGAM core grant (2021)', value: 3600, note: 'Generic institutional block grant, all disciplines' },
+    { label: 'UEM — Fottrell top-up', value: 9177, note: 'Ring-fenced, outside RGAM, UEM-specific' },
+    { label: 'UEM — Free Fees payment', value: 5900, note: "Covers tuition institutions don't charge Irish/EU students" },
+    { label: 'GEM — state contribution (2026 target)', value: 14500, note: 'Phased up from €11,950 in 2021/22' }
+  ];
+  renderHorizontalBar('svg-funding', funding, [cssVar('--primary'), cssVar('--primary'), cssVar('--primary'), cssVar('--secondary')], '#table-funding', { padL: 260, maxVal: 16000 });
 })();
 </script>
