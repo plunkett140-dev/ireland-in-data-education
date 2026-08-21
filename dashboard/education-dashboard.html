@@ -213,6 +213,13 @@
   .legend-item { display: flex; align-items: center; gap: 0.4rem; }
   .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 
+  .ref-group + .ref-group { margin-top: 1.4rem; }
+  .ref-group h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted); margin: 0 0 0.5rem; }
+  .ref-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+  .ref-list li { font-size: 0.88rem; color: var(--ink-secondary); line-height: 1.5; }
+  .ref-list a { color: var(--primary); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; word-break: break-word; }
+  .ref-list a:hover { text-decoration-color: currentColor; }
+
   .tooltip {
     position: absolute;
     pointer-events: none;
@@ -480,6 +487,57 @@
       <table class="data-table hidden" id="table-funding"><thead><tr><th>Funding stream</th><th>Per student, per year</th></tr></thead><tbody></tbody></table>
       <p class="foot-note"><strong>These four bars are deliberately not summed into a single "total."</strong> The Minister's own 2021 answer names RGAM, the Fottrell top-up, and the Free Fees payment as three distinct funding lines for the same undergraduate place, but doesn't state outright whether a given student's place draws all three simultaneously or whether Fottrell-designated places are funded through that route <em>instead of</em> the standard RGAM rate. Adding all three gives ≈€18,680 — plausible, but not confirmed by the source, so it isn't asserted here. GEM's €14,500 is a single, clean, twice-confirmed figure (phased up from €11,950 in 2021/22 via Budget 2023 and Budget 2024, reaching €14,500 for all places by 2026) — the two funding models aren't structured the same way, so they don't reduce to one comparable number. Source: Dáil written answers, Minister for Further and Higher Education, Research, Innovation and Science — 9 Nov 2021 (PQ 510, RGAM/Fottrell/Free Fees figures), 19 Oct 2023 (PQ 104) and 11 Sep 2023 (PQ 2047) (GEM phasing to €14,500).</p>
     </article>
+  </section>
+
+  <!-- ============ REFERENCES ============ -->
+  <section class="group" id="sec-references">
+    <div class="group-head">
+      <h2>References</h2>
+      <p>Every page and document behind the charts above, grouped by section. Exact table/query citations for each number are in the per-section notes and in the pipeline README.</p>
+    </div>
+
+    <div class="ref-group">
+      <h3>Section 01 — GEM fee schedules (2025/26)</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.ucd.ie/medicine/studywithus/undergraduate/graduateentrymedicine/">UCD School of Medicine, Graduate Entry Medicine</a></li>
+        <li><a href="https://www.ucc.ie/en/financeoffice/fees/schedules/">UCC official fee schedules</a> (UCC's per-year fee page only stays live for the current + next academic year, so the direct 2025/26 link this figure came from has since rolled forward — this index page is the durable link)</li>
+        <li><a href="https://www.ul.ie/study/undergraduate/medicine-graduate-entry/fees-and-funding">UL, Medicine (Graduate Entry) fees and funding</a></li>
+        <li><a href="https://www.rcsi.com/dublin/undergraduate/gem/fees-and-funding">RCSI, Graduate Entry Medicine fees and funding</a></li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Sections 02, 04, 05 — CSO Higher Education Outcomes (PxStat)</h3>
+      <ol class="ref-list">
+        <li><a href="https://data.cso.ie/table/HGO07">HGO07 — Health Graduates by Graduation Year, Gender and Field of Education</a></li>
+        <li><a href="https://data.cso.ie/table/HGO09">HGO09 — Graduate Outcomes by Years Since Graduation</a></li>
+        <li><a href="https://data.cso.ie/table/HGO14">HGO14 — Graduate Sector of Employment</a></li>
+        <li><a href="https://data.cso.ie/table/HGO16">HGO16 — Graduate Occupation (Census 2022-matched)</a></li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Section 03 — HEA enrolments</h3>
+      <ol class="ref-list">
+        <li><a href="https://highereducationauthority.shinyapps.io/Enrolments25/">Higher Education Authority, Student Enrolments dashboard (Shiny)</a></li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Section 06 — Undergraduate medicine intake</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.oireachtas.ie/en/debates/question/2025-03-27/42/">Dáil written answer, PQ 42, 27 March 2025</a> — Minister for Further and Higher Education, Research, Innovation and Science, attached data file "Medicine Student Data"</li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Section 07 — Government funding per student</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.oireachtas.ie/en/debates/question/2021-11-09/510/">Dáil written answer, PQ 510, 9 November 2021</a> — RGAM, Fottrell top-up, Free Fees figures</li>
+        <li><a href="https://www.oireachtas.ie/en/debates/question/2023-10-19/104/">Dáil written answer, PQ 104, 19 October 2023</a></li>
+        <li><a href="https://www.oireachtas.ie/en/debates/question/2023-09-11/2047/">Dáil written answer, PQ 2047, 11 September 2023</a> — GEM state contribution phasing to €14,500</li>
+      </ol>
+    </div>
   </section>
 
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>

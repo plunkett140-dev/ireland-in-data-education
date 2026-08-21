@@ -173,6 +173,13 @@
   .legend-item { display: flex; align-items: center; gap: 0.4rem; }
   .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 
+  .ref-group + .ref-group { margin-top: 1.4rem; }
+  .ref-group h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted); margin: 0 0 0.5rem; }
+  .ref-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+  .ref-list li { font-size: 0.88rem; color: var(--ink-secondary); line-height: 1.5; }
+  .ref-list a { color: var(--primary); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; word-break: break-word; }
+  .ref-list a:hover { text-decoration-color: currentColor; }
+
   .tooltip {
     position: absolute; pointer-events: none; background: var(--ink); color: var(--bg);
     font-size: 0.78rem; font-family: "Source Sans 3", sans-serif; padding: 0.5rem 0.7rem;
@@ -453,6 +460,43 @@
     <p class="foot-note">A single-year snapshot, not a trend — this exact grade-by-grade breakdown ("Table 2. NCHD Workforce by Grade and Hospital Type") only appears in this shape in the 2025-26 report; earlier reports don't publish the same table, and SOURCES.md already documents how much HSE's table numbering/structure shifts year to year, so a multi-year version wasn't attempted here. "Specialist Registrar" here is the SpR post-grade (year of HST training), not to be confused with "Senior Registrar," a separate, more senior grade with far fewer posts (184 nationally) — genuinely two different rungs despite the similar names, both present in HSE's own pay-scale grade list (Section 06). Consultant total from Table 1 (Overview); all NCHD grades, including the training/NTSD split for SHO and Registrar, from Table 2. Source: HSE Medical Workforce Report 2025-26, Table 1 and Table 2.</p>
   </section>
 
+  <!-- ============ REFERENCES ============ -->
+  <section class="group" id="sec-references">
+    <div class="group-head">
+      <h2>References</h2>
+      <p>Every report, page, and document behind the charts above, grouped by section. Exact table/figure citations for each number are in the per-section notes, and in <code>data/raw/hse/SOURCES.md</code> and <code>data/raw/medical-council/SOURCES.md</code>.</p>
+    </div>
+
+    <div class="ref-group">
+      <h3>Sections 01, 02, 05, 07 — HSE Medical Workforce Reports</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/ed/rep/medical-workforce-report-2019-2020.pdf">Medical Workforce Report 2019-20</a></li>
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/ed/rep/medical-workforce-report-2020-21.pdf">Medical Workforce Report 2020-21</a></li>
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/plan/ndtp-workforce-report-2021-2023.pdf">Medical Workforce Report 2021-22</a> (URL slug says "2021-2023"; the document itself is titled 2021-2022)</li>
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/plan/ndtp-medical-workforce-report-2023.pdf">Medical Workforce Report 2022-23</a></li>
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/plan/medical-workforce-report-23-24-digital.pdf">Medical Workforce Report 2023-24</a></li>
+        <li><a href="https://www.hse.ie/eng/staff/leadership-education-development/met/plan/medical-workforce-analysis-report-2024-2025.pdf">Medical Workforce Analysis Report 2024-25</a></li>
+        <li><a href="https://www.medicalcareers.ie/wp-content/uploads/2026/04/Medical-Workforce-Report-2025-2026-FINAL-DIGITAL.pdf">Medical Workforce Report 2025-26</a> (medicalcareers.ie mirror — hse.ie was down site-wide when this was pulled; see SOURCES.md)</li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Sections 03, 04 — Medical Council of Ireland</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.medicalcouncil.ie/news-and-publications/reports/2022-medical-workforce-intelligence-consolidated-report.pdf">Medical Workforce Intelligence (Consolidated) Report 2022</a></li>
+        <li><a href="https://www.medicalcouncil.ie/news-and-publications/reports/medical-workforce-intelligence-report-2023.pdf">Medical Workforce Intelligence Report 2023</a></li>
+        <li><a href="https://www.medicalcouncil.ie/news-and-publications/reports/medical-workforce-intelligence-report-2024.pdf">Medical Workforce Intelligence Report 2024</a> (most recent available — no 2025 edition published yet)</li>
+      </ol>
+    </div>
+
+    <div class="ref-group">
+      <h3>Section 06 — HSE pay scales</h3>
+      <ol class="ref-list">
+        <li><a href="https://www.hse.ie/eng/staff/resources/hr-circulars/august-1st-2025-pay-scales.pdf">HSE Health Sector Consolidated Salary Scales, effective 1 August 2025</a></li>
+      </ol>
+    </div>
+  </section>
+
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
 </div>
 
@@ -613,7 +657,11 @@
     var globalMin = Math.min.apply(null, data.map(function (d) { return d.min; }));
     var pad = (globalMax - globalMin) * 0.12 || globalMax * 0.05;
     var axisMin = Math.max(0, globalMin - pad), axisMax = globalMax + pad;
-    var barGap = 10, barH = (plotH - barGap * (data.length - 1)) / data.length;
+    // Each row gets an equal-height slot; the bar itself only fills 42% of it,
+    // centered, leaving generous clearance above for the min/max value labels
+    // so adjacent rows' labels don't collide — salary bands overlap heavily in
+    // value-space (that's real), so vertical breathing room is what fixes it.
+    var slot = plotH / data.length, barH = slot * 0.42;
 
     function xPos(v) { return padL + ((v - axisMin) / (axisMax - axisMin)) * plotW; }
 
@@ -630,7 +678,7 @@
     var tbody = document.querySelector(tableSelector + ' tbody');
 
     data.forEach(function (d, i) {
-      var y = padT + i * (barH + barGap);
+      var y = padT + i * slot + (slot - barH) / 2 + 6;
       var x1 = xPos(d.min), x2 = xPos(d.max);
       var w = Math.max(x2 - x1, 4);
       var r = barH / 2.2;
