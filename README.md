@@ -40,18 +40,26 @@ update the inline arrays at the bottom of the file to refresh it.
 
 `dashboard/hse-workforce-dashboard.html` — a second, separate static
 dashboard covering seven years (2019/20–2025/26) of HSE's own annual
-Medical Workforce Reports. Each of its 4 sections pairs a current-year
-(2025) detail snapshot with a multi-year trend chart: consultant/NCHD/NTSD
-headcount growth; the vacant consultant posts spike-then-fall-then-rise
-(179 → 445 → 309 → 324) alongside 2025's breakdown by how long each post's
-been vacant; NTSD country of graduation since 2022 (Pakistan overtaking
-Ireland as the largest single source, 34.2% vs 21.8% in 2025) alongside
-2025's full, unconsolidated country/region breakdown; and specialty-level
-vacancies (top 12 for 2025, plus a 4-year trend for 3 specialties with
-notably different trajectories). Not built from the DuckDB pipeline — HSE
-publishes dense annual PDFs, not an API or clean CSVs, so this data was
-pulled by hand from seven PDFs (see `data/raw/hse/SOURCES.md` for the
-exact table/figure citation behind every number, including a real
+Medical Workforce Reports, plus a second source for one section. Sections
+01-03 and 05 pair a current-year detail snapshot with a multi-year trend
+chart, from HSE's own reports: consultant/NCHD/NTSD headcount growth;
+the vacant consultant posts spike-then-fall-then-rise (179 → 445 → 309 →
+324) alongside 2025's breakdown by how long each post's been vacant; NTSD
+country of graduation since 2022 (Pakistan overtaking Ireland as the
+largest single source, 34.2% vs 21.8% in 2025) alongside 2025's full,
+unconsolidated country/region breakdown; and specialty-level vacancies
+(top 12 for 2025, plus a 4-year trend for 3 specialties with notably
+different trajectories). Section 04 switches source to the Medical
+Council of Ireland's Medical Workforce Intelligence Reports, the only
+place a country/qualification breakdown exists for Consultants and
+training-scheme NCHDs, not just NTSDs — Irish-qualified share fell
+2022-2024 in all three divisions, fastest among trainees (80.6% → 71.3%).
+Section 06 covers official 1 Aug 2025 NCHD and Consultant pay scales, a
+different HSE document again (none of the seven Medical Workforce Reports
+carry pay figures). Not built from the DuckDB pipeline — none of these
+are API/clean-CSV sources, so all of it was pulled by hand from PDFs (see
+`data/raw/hse/SOURCES.md` and `data/raw/medical-council/SOURCES.md` for
+the exact table/figure citation behind every number, including a real
 cross-report Consultant Workforce revision pattern worth knowing about)
 rather than scraped. Chart data is inlined the same way as the education
 dashboard — update the arrays in the file directly to refresh.
@@ -69,7 +77,8 @@ schema/
 data/raw/
   hea/                Raw HEA enrolment CSV snapshots (programme type, domicile, gender)
   cso/                Raw CSO HGO CSV snapshots
-  hse/                Six years of HSE Medical Workforce Report PDFs + SOURCES.md citations
+  hse/                Seven years of HSE Medical Workforce Report PDFs + SOURCES.md citations
+  medical-council/    Three years of Medical Council Workforce Intelligence Report PDFs + SOURCES.md citations
 dashboard/
   education-dashboard.html      Static chart dashboard, see above
   hse-workforce-dashboard.html  HSE workforce dashboard, see above

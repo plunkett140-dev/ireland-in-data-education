@@ -326,10 +326,49 @@
     <p class="foot-note">The trend chart's "Other" combines every minor country each report lists separately — exact splits (Romania, South Africa, Egypt, and continent-level buckets from 2024 on) are in SOURCES.md. This is NTSDs specifically — HSE doesn't publish this breakdown for consultants or training-scheme doctors. Source: HSE Medical Workforce Reports 2022-23 (Fig. 4.20), 2023-24 (Fig. 23), 2024-25 (Fig. 24), 2025-26 (Fig. 30).</p>
   </section>
 
-  <!-- ============ SECTION 4: VACANCY BY SPECIALTY ============ -->
+  <!-- ============ SECTION 4: QUALIFICATION BY DIVISION ============ -->
+  <section class="group" id="sec-qualification">
+    <div class="group-head">
+      <h2><span class="group-num">04</span> Irish-qualified — consultants and trainees too, not just NTSDs</h2>
+      <p>Section 03 only covers NTSDs, because that's the only breakdown HSE itself publishes. The Medical Council of Ireland separately publishes where <em>every</em> registered doctor qualified, split by Division of the Register — close proxies for Consultants (Specialist Division) and training-scheme NCHDs (Trainee Specialist Division), not just the General Division doctors closest to HSE's own NTSD category. The share of Irish-qualified doctors fell in all three divisions from 2022 to 2024 — fastest among trainees (80.6% → 71.3%, −9.3pts), well ahead of consultants (74.4% → 72.7%, −1.7pts).</p>
+    </div>
+    <div class="chart-row">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot</p>
+        <div class="chart-head">
+          <div><h3>Qualification mix by division, 2024</h3><p>Specialist ≈ Consultants, General ≈ closest proxy to NTSDs</p></div>
+          <button class="toggle-table" data-target="table-qual-snap" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-qual-snap" viewBox="0 0 420 300" role="img" aria-label="Stacked bar chart of Irish, EU or UK, and international basic medical qualification share for the Specialist, Trainee Specialist, and General divisions of the Medical Council register, 2024"></svg></div>
+        <table class="data-table hidden" id="table-qual-snap"><thead><tr><th>Division</th><th>Irish</th><th>EU or UK</th><th>International</th></tr></thead><tbody></tbody></table>
+        <div class="legend" style="margin-top:0.9rem">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Irish</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--neutral-series)"></span>EU or UK</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>International</span>
+        </div>
+      </article>
+      <article class="chart">
+        <p class="chart-kicker">Trend, 2022–2024</p>
+        <div class="chart-head">
+          <div><h3>Share Irish-qualified, by division</h3><p>2022's report didn't split EU/UK from international, so this compares the one category all three years share</p></div>
+          <button class="toggle-table" data-target="table-qual-trend" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-qual-trend" viewBox="0 0 620 300" role="img" aria-label="Line chart of the share of Irish-qualified doctors for the Specialist, Trainee Specialist, and General divisions from 2022 to 2024"></svg></div>
+        <table class="data-table hidden" id="table-qual-trend"><thead><tr><th>Year</th><th>Specialist</th><th>Trainee Specialist</th><th>General</th></tr></thead><tbody></tbody></table>
+        <div class="legend" style="margin-top:0.9rem">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Specialist (Consultants)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Trainee Specialist</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>General (≈ NTSDs)</span>
+        </div>
+      </article>
+    </div>
+    <p class="foot-note">Different source from Section 03, and not an exact match to HSE's own categories: the Medical Council's "Specialist Division" includes GPs and non-hospital specialists alongside HSE hospital consultants, and "Trainee Specialist Division" isn't defined identically to HSE's NCHD training-scheme headcount — read this as a close, illustrative proxy, not the same population re-cut. Unlike Section 03, these reports don't break the international share down by named country per division — only the coarser Irish / EU-or-UK / international split shown here. No 2025 edition has been published yet (the 2024 report was published August 2025); 2024 is the most current year available. Source: Medical Council of Ireland, Medical Workforce Intelligence (Consolidated) Report 2022 (Figure 11), Medical Workforce Intelligence Report 2023 (Figure 4), Medical Workforce Intelligence Report 2024 (Figure 5).</p>
+  </section>
+
+  <!-- ============ SECTION 5: VACANCY BY SPECIALTY ============ -->
   <section class="group" id="sec-specialty">
     <div class="group-head">
-      <h2><span class="group-num">04</span> Where the gaps are</h2>
+      <h2><span class="group-num">05</span> Where the gaps are</h2>
       <p>Approved consultant posts vacant, by specialty.</p>
     </div>
     <div class="chart-row">
@@ -363,7 +402,7 @@
   <!-- ============ SECTION 5: SALARY BANDS ============ -->
   <section class="group" id="sec-salary">
     <div class="group-head">
-      <h2><span class="group-num">05</span> What they're paid</h2>
+      <h2><span class="group-num">06</span> What they're paid</h2>
       <p>Official HSE consolidated salary scales, current as of 1 August 2025 — not from the Medical Workforce Reports (none of the seven contain pay figures at all), but from HSE's own separately-published pay scales document.</p>
     </div>
     <div class="chart-row">
@@ -543,7 +582,7 @@
   function renderRangeBar(svgId, data, color, tableSelector) {
     var svg = document.getElementById(svgId);
     var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
-    var padL = 150, padR = 20, padT = 22, padB = 10;
+    var padL = 150, padR = 20, padT = 22, padB = 26;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var globalMax = Math.max.apply(null, data.map(function (d) { return d.max; }));
     var globalMin = Math.min.apply(null, data.map(function (d) { return d.min; }));
@@ -599,22 +638,23 @@
   }
 
   // ================= Generic multi-line chart =================
-  function renderLines(svgId, data, seriesKeys, colors, tableSelector) {
+  function renderLines(svgId, data, seriesKeys, colors, tableSelector, opts) {
+    opts = opts || {};
     var svg = document.getElementById(svgId);
     var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
     var padL = 54, padR = 16, padT = 20, padB = 34;
     var plotW = W - padL - padR, plotH = H - padT - padB;
     var allVals = data.flatMap(function (d) { return seriesKeys.map(function (k) { return d[k]; }); });
     var rawMax = Math.max.apply(null, allVals) * 1.08;
-    var niceStep = rawMax > 1000 ? 500 : (rawMax > 100 ? 10 : 5);
-    var maxVal = Math.ceil(rawMax / niceStep) * niceStep;
+    var niceStep = opts.pctMode ? 10 : (rawMax > 1000 ? 500 : (rawMax > 100 ? 10 : 5));
+    var maxVal = opts.pctMode ? 100 : Math.ceil(rawMax / niceStep) * niceStep;
 
     [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
       var v = maxVal * f;
       var y = padT + plotH - (v / maxVal) * plotH;
       svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
       var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' });
-      t.textContent = fmt(Math.round(v)); svg.appendChild(t);
+      t.textContent = opts.pctMode ? Math.round(v) + '%' : fmt(Math.round(v)); svg.appendChild(t);
     });
 
     function xPos(i) { return padL + (i / (data.length - 1)) * plotW; }
@@ -653,7 +693,7 @@
       var px = xPos(idx);
       crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px); crosshair.style.opacity = '1';
       var rows = seriesKeys.map(function (key, si) {
-        return '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + key + '</span> <strong>' + fmt(data[idx][key]) + '</strong></div>';
+        return '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[si] + '"></span><span class="tt-label">' + key + '</span> <strong>' + (opts.pctMode ? pct(data[idx][key]) : fmt(data[idx][key])) + '</strong></div>';
       }).join('');
       tooltip.innerHTML = '<div style="margin-bottom:4px;font-weight:600">' + data[idx].label + '</div>' + rows;
       tooltip.style.opacity = '1';
@@ -663,7 +703,7 @@
 
     var tbody = document.querySelector(tableSelector + ' tbody');
     data.forEach(function (d) {
-      var cells = seriesKeys.map(function (k) { return '<td>' + fmt(d[k]) + '</td>'; }).join('');
+      var cells = seriesKeys.map(function (k) { return '<td>' + (opts.pctMode ? pct(d[k]) : fmt(d[k])) + '</td>'; }).join('');
       var tr = document.createElement('tr'); tr.innerHTML = '<td>' + d.label + '</td>' + cells; tbody.appendChild(tr);
     });
   }
@@ -795,6 +835,60 @@
     });
   }
 
+  // ================= Generic 100%-stacked vertical bar (categorical x-axis) =================
+  function renderStackedBar(svgId, data, seriesKeys, colors, tableSelector) {
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = 50, padR = 16, padT = 20, padB = 42;
+    var plotW = W - padL - padR, plotH = H - padT - padB, maxTotal = 100;
+    var barGap = 28, barW = (plotW - barGap * (data.length - 1)) / data.length;
+
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      var y = padT + plotH - (v / maxTotal) * plotH;
+      svg.appendChild(el('line', { class: 'gridline', x1: padL, x2: W - padR, y1: y, y2: y }));
+      var t = el('text', { class: 'axis', x: padL - 10, y: y + 4, 'text-anchor': 'end' });
+      t.textContent = v + '%'; svg.appendChild(t);
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    data.forEach(function (d, i) {
+      var x = padL + i * (barW + barGap), cum = 0;
+      seriesKeys.forEach(function (key, si) {
+        var v = d[key];
+        var y1 = padT + plotH - (cum / maxTotal) * plotH;
+        cum += v;
+        var y2 = padT + plotH - (cum / maxTotal) * plotH;
+        var rect = el('rect', { x: x, y: y2, width: barW, height: Math.max(y1 - y2, 0), fill: colors[si] });
+        svg.appendChild(rect);
+        var hit = el('rect', { x: x, y: y2, width: barW, height: Math.max(y1 - y2, 0), fill: 'transparent', class: 'hover-target' });
+        svg.appendChild(hit);
+        hit.addEventListener('mouseenter', function () {
+          rect.setAttribute('opacity', '0.8');
+          tooltip.innerHTML = '<span class="tt-label">' + d.label + ' — ' + key + '</span><br><strong>' + pct(v) + '</strong>';
+          tooltip.style.opacity = '1';
+          positionTooltip(tooltip, svg, W, x + barW / 2, (y1 + y2) / 2);
+        });
+        hit.addEventListener('mouseleave', function () { rect.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+      });
+
+      // wrap long labels onto 2 lines by splitting on the last space before ~14 chars
+      var words = d.label.split(' ');
+      var lines = words.length > 1 && d.label.length > 14 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [d.label];
+      lines.forEach(function (line, li) {
+        var nl = el('text', { class: 'bar-label', x: x + barW / 2, y: padT + plotH + 18 + li * 14, 'text-anchor': 'middle' });
+        nl.textContent = line; svg.appendChild(nl);
+      });
+
+      var tr = document.createElement('tr');
+      var cells = seriesKeys.map(function (k) { return '<td>' + pct(d[k]) + '</td>'; }).join('');
+      tr.innerHTML = '<td>' + d.label + '</td>' + cells;
+      tbody.appendChild(tr);
+    });
+  }
+
   // ============================================================
   // SECTION 1 DATA
   // ============================================================
@@ -878,7 +972,30 @@
     [cssVar('--secondary'), cssVar('--primary'), cssVar('--tertiary'), cssVar('--neutral-series')], '#table-nationality');
 
   // ============================================================
-  // SECTION 4 DATA
+  // SECTION 4 DATA — Medical Council of Ireland, Medical Workforce
+  // Intelligence Reports 2022 (Fig. 11), 2023 (Fig. 4), 2024 (Fig. 5)
+  // ============================================================
+  var qualSnap2024 = [
+    { label: 'Specialist (≈ Consultants)', Irish: 72.7, 'EU or UK': 16.1, International: 11.3 },
+    { label: 'Trainee Specialist', Irish: 71.3, 'EU or UK': 10.1, International: 18.6 },
+    { label: 'General (≈ NTSDs)', Irish: 28.5, 'EU or UK': 12.8, International: 58.7 }
+  ];
+  renderStackedBar('svg-qual-snap', qualSnap2024, ['Irish', 'EU or UK', 'International'],
+    [cssVar('--primary'), cssVar('--neutral-series'), cssVar('--secondary')], '#table-qual-snap');
+
+  // 2022's report only split Irish vs. International BMQ (no EU/UK breakdown),
+  // so the trend chart tracks % Irish-qualified specifically — the one figure
+  // comparable across all three years for every division.
+  var qualTrend = [
+    { label: '2022', Specialist: 74.4, 'Trainee Specialist': 80.6, General: 36.4 },
+    { label: '2023', Specialist: 73.4, 'Trainee Specialist': 78.2, General: 34.0 },
+    { label: '2024', Specialist: 72.7, 'Trainee Specialist': 71.3, General: 28.5 }
+  ];
+  renderLines('svg-qual-trend', qualTrend, ['Specialist', 'Trainee Specialist', 'General'],
+    [cssVar('--primary'), cssVar('--tertiary'), cssVar('--secondary')], '#table-qual-trend', { pctMode: true });
+
+  // ============================================================
+  // SECTION 5 DATA
   // ============================================================
   var specialtySnap2025 = [
     { label: 'Psychiatry', value: 34 }, { label: 'Radiology', value: 30 }, { label: 'Paediatrics', value: 23 },
