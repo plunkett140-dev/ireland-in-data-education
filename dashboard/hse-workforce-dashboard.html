@@ -428,6 +428,31 @@
     <p class="foot-note"><strong>Two important gaps this doesn't cover:</strong> only about a third of currently serving consultants have signed the 2023 contract shown here — most remain on older contracts (2008 Type A/Type B, or the 1997 Revised Common Contract), which have a different structure (some permit private practice, category/region-dependent rates) and aren't charted here; see the source PDF's Consultant tab for those. And these are scale <em>points</em>, not a distribution of who actually earns what — this says what the bands are, not how many doctors sit at each point, or how allowances (on-call payments, up to €12,014/year on the most onerous rota; a €58,446 Clinical Directors' allowance; etc.) change take-home pay on top of base salary. Source: HSE "Health Sector Consolidated Salary Scales", effective 1 August 2025, <code>data/raw/hse/hse-consolidated-salary-scales-aug-2025.pdf</code> — Intern, SHO, Registrar, Specialist Registrar, and Senior Registrar scales (page ~4), Consultant Contract 2023 Clinical and Academic scales (page ~42).</p>
   </section>
 
+  <!-- ============ SECTION 7: THE WHOLE LADDER, ONE CHART ============ -->
+  <section class="group" id="sec-pyramid">
+    <div class="group-head">
+      <h2><span class="group-num">07</span> Every grade, one chart — and it isn't a pyramid</h2>
+      <p>All 15,043 hospital doctors publicly employed in Ireland in 2025, by grade, in one bar chart: Consultant down to Intern, with the Senior House Officer and Registrar grades split into their training-scheme and non-training-scheme (NTSD) halves — the same two populations charted separately in Sections 01-04. A textbook seniority pyramid narrows every step up. This doesn't: Consultant is the single largest grade in the whole system, bigger than any individual training rung below it. That's not an error — Consultant posts are long-tenure career endpoints doctors hold for decades, while Intern/SHO/Registrar posts rotate a much larger number of different doctors through the same seats every single year. A headcount snapshot isn't a measure of pipeline throughput.</p>
+    </div>
+    <div class="chart-row" style="grid-template-columns:1fr">
+      <article class="chart">
+        <p class="chart-kicker">Snapshot, 2025</p>
+        <div class="chart-head">
+          <div><h3>Headcount by grade</h3><p>Consultant (most senior) to Intern (most junior); SHO and Registrar split training vs. NTSD</p></div>
+          <button class="toggle-table" data-target="table-pyramid" aria-expanded="false">Table</button>
+        </div>
+        <div class="chart-wrap"><svg id="svg-pyramid" viewBox="0 0 860 320" role="img" aria-label="Horizontal bar chart of hospital doctor headcount by grade in 2025, from Consultant to Intern, with SHO and Registrar grades split into training and non-training-scheme portions"></svg></div>
+        <table class="data-table hidden" id="table-pyramid"><thead><tr><th>Grade</th><th>Training</th><th>NTSD</th><th>Total</th></tr></thead><tbody></tbody></table>
+      </article>
+    </div>
+    <div class="legend" style="margin-top:0.9rem">
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--primary)"></span>Consultant</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--tertiary)"></span>Training-scheme NCHD</span>
+      <span class="legend-item"><span class="legend-swatch" style="background:var(--secondary)"></span>NTSD (non-training)</span>
+    </div>
+    <p class="foot-note">A single-year snapshot, not a trend — this exact grade-by-grade breakdown ("Table 2. NCHD Workforce by Grade and Hospital Type") only appears in this shape in the 2025-26 report; earlier reports don't publish the same table, and SOURCES.md already documents how much HSE's table numbering/structure shifts year to year, so a multi-year version wasn't attempted here. "Specialist Registrar" here is the SpR post-grade (year of HST training), not to be confused with "Senior Registrar," a separate, more senior grade with far fewer posts (184 nationally) — genuinely two different rungs despite the similar names, both present in HSE's own pay-scale grade list (Section 06). Consultant total from Table 1 (Overview); all NCHD grades, including the training/NTSD split for SHO and Registrar, from Table 2. Source: HSE Medical Workforce Report 2025-26, Table 1 and Table 2.</p>
+  </section>
+
   <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
 </div>
 
@@ -889,6 +914,64 @@
     });
   }
 
+  // ================= Grade pyramid: absolute-count horizontal bar, per-segment color =================
+  // Unlike renderStackedBar (100%-normalized, one color per series index), each
+  // row here can have a different number of segments with different colors —
+  // a solo-color Consultant bar, single-color training-only bars, and two-color
+  // training/NTSD split bars all in the same chart. rows: [{ label, parts: [{ key, value, color }] }]
+  function renderPyramid(svgId, rows, tableSelector) {
+    var svg = document.getElementById(svgId);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var padL = 190, padR = 60, padT = 14, padB = 14;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var totals = rows.map(function (r) { return r.parts.reduce(function (s, p) { return s + p.value; }, 0); });
+    var maxVal = Math.ceil(Math.max.apply(null, totals) * 1.15 / 500) * 500;
+    var barGap = 10, barH = (plotH - barGap * (rows.length - 1)) / rows.length;
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (f) {
+      var x = padL + f * plotW;
+      svg.appendChild(el('line', { class: 'gridline', x1: x, x2: x, y1: padT, y2: padT + plotH }));
+    });
+
+    var container = svg.closest('article').querySelector('.chart-wrap');
+    var tooltip = makeTooltip(container);
+    var tbody = document.querySelector(tableSelector + ' tbody');
+
+    rows.forEach(function (r, i) {
+      var y = padT + i * (barH + barGap), total = totals[i], cum = 0;
+      r.parts.forEach(function (p) {
+        var x1 = padL + (cum / maxVal) * plotW;
+        cum += p.value;
+        var x2 = padL + (cum / maxVal) * plotW;
+        var w = Math.max(x2 - x1, 0);
+        var rect = el('rect', { x: x1, y: y, width: w, height: barH, fill: p.color });
+        svg.appendChild(rect);
+        if (w > 0) {
+          var hit = el('rect', { x: x1, y: y, width: w, height: barH, fill: 'transparent', class: 'hover-target' });
+          svg.appendChild(hit);
+          hit.addEventListener('mouseenter', function () {
+            rect.setAttribute('opacity', '0.8');
+            tooltip.innerHTML = '<span class="tt-label">' + r.label + ' — ' + p.key + '</span><br><strong>' + fmt(p.value) + '</strong>';
+            tooltip.style.opacity = '1';
+            positionTooltip(tooltip, svg, W, (x1 + x2) / 2, y);
+          });
+          hit.addEventListener('mouseleave', function () { rect.setAttribute('opacity', '1'); tooltip.style.opacity = '0'; });
+        }
+      });
+
+      var lbl = el('text', { class: 'bar-label', x: padL - 10, y: y + barH / 2 + 4, 'text-anchor': 'end' });
+      lbl.textContent = r.label; svg.appendChild(lbl);
+      var totLbl = el('text', { class: 'bar-value', x: padL + (total / maxVal) * plotW + 8, y: y + barH / 2 + 4, 'text-anchor': 'start' });
+      totLbl.textContent = fmt(total); svg.appendChild(totLbl);
+
+      var tr = document.createElement('tr');
+      var training = r.parts.filter(function (p) { return p.key === 'Training' || p.key === 'Consultant'; }).reduce(function (s, p) { return s + p.value; }, 0);
+      var ntsd = r.parts.filter(function (p) { return p.key === 'NTSD'; }).reduce(function (s, p) { return s + p.value; }, 0);
+      tr.innerHTML = '<td>' + r.label + '</td><td>' + (training ? fmt(training) : '—') + '</td><td>' + (ntsd ? fmt(ntsd) : '—') + '</td><td>' + fmt(total) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
   // ============================================================
   // SECTION 1 DATA
   // ============================================================
@@ -1034,5 +1117,23 @@
     { label: 'Academic Professor', min: 287029, max: 344798, points: 6 }
   ];
   renderRangeBar('svg-salary-consultant', salaryConsultant, cssVar('--secondary'), '#table-salary-consultant');
+
+  // ============================================================
+  // SECTION 7 DATA — HSE Medical Workforce Report 2025-26, Table 1
+  // (Consultant total) and Table 2 (NCHD Workforce by Grade), national
+  // "Total" row. NCHDs in Training Posts Total (6,063) + NCHDs in
+  // Non-Training Posts Total (4,018) = 10,081 NCHDs; +4,962 Consultants
+  // = 15,043 doctors overall.
+  // ============================================================
+  var pyramid = [
+    { label: 'Consultant', parts: [{ key: 'Consultant', value: 4962, color: cssVar('--primary') }] },
+    { label: 'Post-CSCST Fellowship', parts: [{ key: 'Training', value: 65, color: cssVar('--tertiary') }] },
+    { label: 'Senior Registrar', parts: [{ key: 'Training', value: 184, color: cssVar('--tertiary') }] },
+    { label: 'Specialist Registrar (SpR)', parts: [{ key: 'Training', value: 1939, color: cssVar('--tertiary') }] },
+    { label: 'Registrar', parts: [{ key: 'Training', value: 946, color: cssVar('--tertiary') }, { key: 'NTSD', value: 2603, color: cssVar('--secondary') }] },
+    { label: 'SHO', parts: [{ key: 'Training', value: 2068, color: cssVar('--tertiary') }, { key: 'NTSD', value: 1415, color: cssVar('--secondary') }] },
+    { label: 'Intern', parts: [{ key: 'Training', value: 861, color: cssVar('--tertiary') }] }
+  ];
+  renderPyramid('svg-pyramid', pyramid, '#table-pyramid');
 })();
 </script>

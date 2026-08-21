@@ -56,7 +56,15 @@ training-scheme NCHDs, not just NTSDs — Irish-qualified share fell
 2022-2024 in all three divisions, fastest among trainees (80.6% → 71.3%).
 Section 06 covers official 1 Aug 2025 NCHD and Consultant pay scales, a
 different HSE document again (none of the seven Medical Workforce Reports
-carry pay figures). Not built from the DuckDB pipeline — none of these
+carry pay figures). Section 07 is a single 2025 snapshot combining
+Table 1 and Table 2 of the 2025-26 report into one grade-by-grade
+headcount chart, Consultant down to Intern — deliberately not a trend,
+since this exact table shape doesn't appear in earlier reports. The
+headline finding is that it isn't a real seniority pyramid: Consultant
+(4,962) is the single largest grade, bigger than any training rung below
+it, because Consultant posts are long-tenure career endpoints while
+junior posts rotate many different doctors through the same seats each
+year. Not built from the DuckDB pipeline — none of these
 are API/clean-CSV sources, so all of it was pulled by hand from PDFs (see
 `data/raw/hse/SOURCES.md` and `data/raw/medical-council/SOURCES.md` for
 the exact table/figure citation behind every number, including a real
