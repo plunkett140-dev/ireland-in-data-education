@@ -412,7 +412,7 @@
       <h2><span class="group-num">06</span> What they're paid</h2>
       <p>Official HSE consolidated salary scales, current as of 1 August 2025 — not from the Medical Workforce Reports (none of the seven contain pay figures at all), but from HSE's own separately-published pay scales document.</p>
     </div>
-    <div class="chart-row">
+    <div class="chart-row" style="grid-template-columns:1fr 1fr">
       <article class="chart">
         <p class="chart-kicker">Snapshot, 1 Aug 2025</p>
         <div class="chart-head">
@@ -657,11 +657,13 @@
     var globalMin = Math.min.apply(null, data.map(function (d) { return d.min; }));
     var pad = (globalMax - globalMin) * 0.12 || globalMax * 0.05;
     var axisMin = Math.max(0, globalMin - pad), axisMax = globalMax + pad;
-    // Each row gets an equal-height slot; the bar itself only fills 42% of it,
-    // centered, leaving generous clearance above for the min/max value labels
-    // so adjacent rows' labels don't collide — salary bands overlap heavily in
-    // value-space (that's real), so vertical breathing room is what fixes it.
-    var slot = plotH / data.length, barH = slot * 0.42;
+    // Each row gets an equal-height slot; the bar itself is a fixed height,
+    // centered in the slot, leaving clearance above for the min/max value
+    // labels so adjacent rows' labels don't collide — salary bands overlap
+    // heavily in value-space (that's real), so vertical breathing room is
+    // what fixes it. Fixed (not slot-proportional) so a 4-row and a 5-row
+    // chart draw identically thick bars side by side, not just same-scale.
+    var slot = plotH / data.length, barH = 22;
 
     function xPos(v) { return padL + ((v - axisMin) / (axisMax - axisMin)) * plotW; }
 
