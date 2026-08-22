@@ -88,6 +88,15 @@
     margin: 0;
   }
 
+  .home-link {
+    display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none;
+    color: var(--ink-secondary); font-family: "Source Sans 3", sans-serif;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 1.75rem;
+  }
+  .home-link:hover { color: var(--ink); }
+  .home-link:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
+  .home-link svg { width: 26px; height: 26px; border-radius: 6px; flex: none; }
+
   header.masthead { margin-bottom: 2rem; }
 
   .eyebrow {
@@ -256,6 +265,18 @@
 </style>
 
 <div class="page">
+
+  <a href="/" class="home-link" aria-label="Back to Ireland in Data home">
+    <svg viewBox="0 0 150 150" role="img" aria-hidden="true">
+      <rect width="150" height="150" rx="28" fill="#169B62" />
+      <rect x="30" y="109" width="16" height="26" rx="3" fill="#FFFFFF" />
+      <rect x="56" y="89" width="16" height="46" rx="3" fill="#FFFFFF" />
+      <rect x="82" y="69" width="16" height="66" rx="3" fill="#FFFFFF" />
+      <rect x="108" y="49" width="16" height="86" rx="3" fill="#FFFFFF" />
+      <circle cx="116" cy="35" r="9" fill="#FF883E" />
+    </svg>
+    <span>Ireland in Data</span>
+  </a>
 
   <header class="masthead">
     <p class="eyebrow">Ireland in Data · Education</p>
