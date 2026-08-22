@@ -88,14 +88,30 @@
     margin: 0;
   }
 
-  .home-link {
-    display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none;
-    color: var(--ink-secondary); font-family: "Source Sans 3", sans-serif;
-    font-size: 0.88rem; font-weight: 600; margin-bottom: 1.75rem;
+  .site-nav {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    gap: 0.75rem 1.25rem; margin-bottom: 2.25rem; padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
   }
-  .home-link:hover { color: var(--ink); }
-  .home-link:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
-  .home-link svg { width: 26px; height: 26px; border-radius: 6px; flex: none; }
+  .site-nav .brand {
+    display: inline-flex; align-items: center; gap: 0.55rem; text-decoration: none;
+    color: var(--ink); font-family: "Source Sans 3", sans-serif; font-size: 0.98rem; font-weight: 700;
+  }
+  .site-nav .brand svg { width: 28px; height: 28px; border-radius: 6px; flex: none; }
+  .site-nav .brand:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
+  .site-nav-links { display: flex; align-items: center; gap: 1.5rem; font-family: "Source Sans 3", sans-serif; font-size: 0.88rem; font-weight: 600; }
+  .site-nav-links a { color: var(--ink-secondary); text-decoration: none; }
+  .site-nav-links a:hover { color: var(--ink); }
+  .site-nav-links a:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
+  .site-nav-links a.current { color: var(--primary); }
+
+  .site-footer { margin-top: 4rem; padding-top: 1.75rem; border-top: 1px solid var(--border); }
+  .site-footer-links { display: flex; flex-wrap: wrap; gap: 1rem 1.4rem; font-family: "Source Sans 3", sans-serif; font-size: 0.86rem; font-weight: 600; }
+  .site-footer-links a { color: var(--ink-secondary); text-decoration: none; }
+  .site-footer-links a:hover { color: var(--ink); }
+  .site-footer-links a:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 4px; }
+  .site-footer .tagline { margin: 0.9rem 0 0; max-width: 60ch; font-size: 0.82rem; color: var(--ink-muted); line-height: 1.5; }
+  .site-footer .copyright { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--ink-muted); opacity: 0.8; }
 
   header.masthead { margin-bottom: 2rem; }
 
@@ -259,24 +275,30 @@
 
   .foot-note { font-size: 0.78rem; color: var(--ink-muted); border-top: 1px solid var(--border); padding-top: 0.8rem; margin-top: 1rem; }
 
-  footer.page-foot { color: var(--ink-muted); font-size: 0.83rem; text-align: center; margin-top: 2.5rem; }
 
   @media (max-width: 560px) { .tiles { grid-template-columns: 1fr; } }
 </style>
 
 <div class="page">
 
-  <a href="/" class="home-link" aria-label="Back to Ireland in Data home">
-    <svg viewBox="0 0 150 150" role="img" aria-hidden="true">
-      <rect width="150" height="150" rx="28" fill="#169B62" />
-      <rect x="30" y="109" width="16" height="26" rx="3" fill="#FFFFFF" />
-      <rect x="56" y="89" width="16" height="46" rx="3" fill="#FFFFFF" />
-      <rect x="82" y="69" width="16" height="66" rx="3" fill="#FFFFFF" />
-      <rect x="108" y="49" width="16" height="86" rx="3" fill="#FFFFFF" />
-      <circle cx="116" cy="35" r="9" fill="#FF883E" />
-    </svg>
-    <span>Ireland in Data</span>
-  </a>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/" class="brand">
+      <svg viewBox="0 0 150 150" role="img" aria-hidden="true">
+        <rect width="150" height="150" rx="28" fill="#169B62" />
+        <rect x="30" y="109" width="16" height="26" rx="3" fill="#FFFFFF" />
+        <rect x="56" y="89" width="16" height="46" rx="3" fill="#FFFFFF" />
+        <rect x="82" y="69" width="16" height="66" rx="3" fill="#FFFFFF" />
+        <rect x="108" y="49" width="16" height="86" rx="3" fill="#FFFFFF" />
+        <circle cx="116" cy="35" r="9" fill="#FF883E" />
+      </svg>
+      <span>Ireland in Data</span>
+    </a>
+    <div class="site-nav-links">
+      <a href="/#dashboards" class="current">Dashboards</a>
+      <a href="/articles">Articles</a>
+      <a href="/about">About</a>
+    </div>
+  </nav>
 
   <header class="masthead">
     <p class="eyebrow">Ireland in Data · Education</p>
@@ -561,7 +583,17 @@
     </div>
   </section>
 
-  <footer class="page-foot">Education pipeline · <a href="https://github.com/plunkett140-dev/ireland-in-data-education" style="color:inherit">ireland-in-data-education</a></footer>
+  <footer class="site-footer">
+    <nav class="site-footer-links" aria-label="Site footer">
+      <a href="/">Home</a>
+      <a href="/#dashboards">Dashboards</a>
+      <a href="/articles">Articles</a>
+      <a href="/about">About</a>
+      <a href="https://github.com/plunkett140-dev/ireland-in-data-education">GitHub (this pipeline)</a>
+    </nav>
+    <p class="tagline">An open, evidence-based, reproducible digital observatory of the Irish healthcare system — every statistic, chart, and conclusion traceable to its original source and independently regenerable.</p>
+    <p class="copyright">© 2026 Ireland in Data</p>
+  </footer>
 </div>
 
 <script>
